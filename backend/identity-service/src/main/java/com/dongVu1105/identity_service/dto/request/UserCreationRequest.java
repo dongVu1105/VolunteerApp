@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Set;
 
 
@@ -22,7 +23,7 @@ public class UserCreationRequest {
     String firstName;
     String lastName;
     String phoneNumber;
-    Instant birthday;
+    LocalDate birthday;
     boolean gender;
-    Set<Role> role;
+    Set<String> role;
 }

@@ -3,10 +3,12 @@ package com.dongVu1105.identity_service.service;
 import com.dongVu1105.identity_service.constant.PredefinedRole;
 import com.dongVu1105.identity_service.dto.request.UserCreationRequest;
 import com.dongVu1105.identity_service.dto.response.UserResponse;
+import com.dongVu1105.identity_service.entity.Role;
 import com.dongVu1105.identity_service.entity.User;
 import com.dongVu1105.identity_service.exception.AppException;
 import com.dongVu1105.identity_service.exception.ErrorCode;
 import com.dongVu1105.identity_service.mapper.UserMapper;
+import com.dongVu1105.identity_service.repository.RoleRepository;
 import com.dongVu1105.identity_service.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -24,11 +29,14 @@ public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
+    RoleRepository roleRepository;
 
     public UserResponse create (UserCreationRequest request){
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setStatusAccount(true);
+        Set<Role> roles = new HashSet<>(roleRepository.findAllById(request.getRole()));
+        user.setRole(roles);
         // update profile
 
         //
