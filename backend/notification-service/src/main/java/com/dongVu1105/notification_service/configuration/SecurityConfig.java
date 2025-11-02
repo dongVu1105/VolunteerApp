@@ -1,4 +1,4 @@
-package com.dongVu1105.file_service.configuration;
+package com.dongVu1105.notification_service.configuration;
 
 
 import org.springframework.context.annotation.Bean;
@@ -18,7 +18,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
     private static final String[] PUBLIC_ENDPOINTS = {
-            "/internal/media/upload"
     };
 
     private final CustomJwtDecoder customJwtDecoder;

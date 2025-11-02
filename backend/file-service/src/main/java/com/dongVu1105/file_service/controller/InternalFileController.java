@@ -16,17 +16,14 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/media")
+@RequestMapping("/internal/media")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class FileController {
+public class InternalFileController {
     FileService fileService;
 
-    @GetMapping("/download/{fileName}")
-    ResponseEntity<Resource> download(@PathVariable String fileName) throws IOException {
-        FileData fileData = fileService.download(fileName);
-        return ResponseEntity.<Resource>ok()
-                .header(HttpHeaders.CONTENT_TYPE, fileData.contentType())
-                .body(fileData.resource());
+    @PostMapping("/upload")
+    public ApiResponse<FileResponse> upload (@RequestParam("file") MultipartFile multipartFile) throws IOException {
+        return ApiResponse.<FileResponse>builder().data(fileService.upload(multipartFile)).build();
     }
 }

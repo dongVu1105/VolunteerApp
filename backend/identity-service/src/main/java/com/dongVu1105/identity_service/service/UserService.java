@@ -66,5 +66,11 @@ public class UserService {
                 .build();
     }
 
+    public UserResponse findById (String id){
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        return userMapper.toUserResponse(user);
+    }
+
 
 }
