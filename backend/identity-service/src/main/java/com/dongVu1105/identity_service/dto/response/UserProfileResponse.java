@@ -18,6 +18,7 @@ public class UserProfileResponse {
     String lastName;
     String phoneNumber;
     LocalDate birthday;
+    String identityNumber;
     boolean gender;
     String avatar;
 }

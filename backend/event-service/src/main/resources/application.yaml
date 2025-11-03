@@ -1,0 +1,20 @@
+server:
+  port: 8084
+  servlet:
+    context-path: /event
+
+
+spring:
+  application:
+    name: event-service
+  data:
+    mongodb:
+      uri: mongodb://root:root@localhost:27017/event-service?authSource=admin
+      auto-index-creation: true
+
+app:
+  services:
+    identity: http://localhost:8080/identity
+    file: http://localhost:8082/file
+  account:
+    admin: admin@gmail.com

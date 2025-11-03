@@ -18,5 +18,6 @@ public class ProfileCreationRequest {
     String lastName;
     String phoneNumber;
     LocalDate birthday;
+    String identityNumber;
     boolean gender;
 }

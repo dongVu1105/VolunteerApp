@@ -22,11 +22,6 @@ import java.io.IOException;
 public class FileController {
     FileService fileService;
 
-    @PostMapping("/upload")
-    public ApiResponse<FileResponse> upload (@RequestParam("file") MultipartFile multipartFile) throws IOException {
-        return ApiResponse.<FileResponse>builder().data(fileService.upload(multipartFile)).build();
-    }
-
     @GetMapping("/download/{fileName}")
     ResponseEntity<Resource> download(@PathVariable String fileName) throws IOException {
         FileData fileData = fileService.download(fileName);

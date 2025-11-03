@@ -63,7 +63,14 @@ public class UserService {
                 .gender(userProfileResponse.isGender())
                 .phoneNumber(userProfileResponse.getPhoneNumber())
                 .username(userProfileResponse.getUsername())
+                .identityNumber(userProfileResponse.getIdentityNumber())
                 .build();
+    }
+
+    public UserResponse findById (String id){
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        return userMapper.toUserResponse(user);
     }
 
 

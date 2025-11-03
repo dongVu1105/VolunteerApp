@@ -25,6 +25,7 @@ public class UserProfile {
     String lastName;
     String phoneNumber;
     LocalDate birthday;
+    String identityNumber;
     boolean gender;
     String avatar;
 }

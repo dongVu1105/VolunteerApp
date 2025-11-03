@@ -23,6 +23,7 @@ public class UserResponse {
     String lastName;
     String phoneNumber;
     LocalDate birthday;
+    String identityNumber;
     boolean gender;
     Set<Role> role;
 }

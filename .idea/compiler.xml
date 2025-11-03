@@ -9,7 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
       </profile>
-      <profile name="Annotation profile for identity-service" enabled="true">
+      <profile name="Annotation profile for event-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -22,15 +22,21 @@
           <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.5.5.Final/mapstruct-processor-1.5.5.Final.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.5.5.Final/mapstruct-1.5.5.Final.jar" />
         </processorPath>
-        <module name="identity-service" />
         <module name="profile-service" />
+        <module name="event-service" />
+        <module name="file-service" />
+        <module name="identity-service" />
+        <module name="notification-service" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="api-gateway" options="-parameters" />
+      <module name="event-service" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -Amapstruct.verbose=true" />
+      <module name="file-service" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -Amapstruct.verbose=true" />
       <module name="identity-service" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -Amapstruct.verbose=true" />
+      <module name="notification-service" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -Amapstruct.verbose=true" />
       <module name="profile-service" options="-parameters -Amapstruct.suppressGeneratorTimestamp=true -Amapstruct.defaultComponentModel=spring -Amapstruct.verbose=true" />
     </option>
   </component>
