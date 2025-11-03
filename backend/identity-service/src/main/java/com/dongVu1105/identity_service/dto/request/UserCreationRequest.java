@@ -23,6 +23,7 @@ public class UserCreationRequest {
     String firstName;
     String lastName;
     String phoneNumber;
+    String identityNumber;
     LocalDate birthday;
     boolean gender;
     Set<String> role;

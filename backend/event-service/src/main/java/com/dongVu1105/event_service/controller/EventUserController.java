@@ -74,7 +74,7 @@ public class EventUserController {
     }
 
     // Quản lí sự kiện xem các user đang tham gia event
-    @GetMapping("/pending")
+    @GetMapping("/attending")
     public ApiResponse<PageResponse<EventUserResponse>> findAllAttendingUser (
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size,

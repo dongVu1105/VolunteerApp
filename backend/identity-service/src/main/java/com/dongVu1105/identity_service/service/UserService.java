@@ -63,6 +63,7 @@ public class UserService {
                 .gender(userProfileResponse.isGender())
                 .phoneNumber(userProfileResponse.getPhoneNumber())
                 .username(userProfileResponse.getUsername())
+                .identityNumber(userProfileResponse.getIdentityNumber())
                 .build();
     }
 

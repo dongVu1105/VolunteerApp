@@ -20,6 +20,7 @@ public class EventResponse {
     Instant startDate;
     Instant finishDate;
     String category;
+    /// Chuyển sang username
     String managerId;
     String createdDate;
     String image;

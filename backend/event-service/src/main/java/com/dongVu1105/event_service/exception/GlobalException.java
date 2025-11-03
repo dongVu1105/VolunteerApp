@@ -10,12 +10,12 @@ import java.nio.file.AccessDeniedException;
 
 @ControllerAdvice
 public class GlobalException {
-    @ExceptionHandler(value = RuntimeException.class)
-    public ResponseEntity<ApiResponse> handleRuntimeException (RuntimeException e){
-        ErrorCode errorCode = ErrorCode.UNCATEGORIZED;
-        return ResponseEntity.status(errorCode.getHttpStatus())
-                .body(ApiResponse.builder().code(errorCode.getCode()).message(errorCode.getMessage()).build());
-    }
+//    @ExceptionHandler(value = RuntimeException.class)
+//    public ResponseEntity<ApiResponse> handleRuntimeException (RuntimeException e){
+//        ErrorCode errorCode = ErrorCode.UNCATEGORIZED;
+//        return ResponseEntity.status(errorCode.getHttpStatus())
+//                .body(ApiResponse.builder().code(errorCode.getCode()).message(errorCode.getMessage()).build());
+//    }
 
     @ExceptionHandler(value = AppException.class)
     public ResponseEntity<ApiResponse> handleAppException (AppException appException){

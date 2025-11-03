@@ -13,7 +13,9 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 public class EventUserResponse {
     String id;
     String eventUserHash;
+    /// Chuyển sang username
     String userId;
+    /// Chuyển sang title
     String eventId;
     String status;
 }

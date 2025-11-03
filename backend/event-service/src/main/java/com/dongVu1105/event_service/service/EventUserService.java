@@ -2,11 +2,13 @@ package com.dongVu1105.event_service.service;
 
 import com.dongVu1105.event_service.dto.request.EventUserCreationRequest;
 import com.dongVu1105.event_service.dto.response.*;
+import com.dongVu1105.event_service.entity.Event;
 import com.dongVu1105.event_service.entity.EventUser;
 import com.dongVu1105.event_service.enums.EventUserStatus;
 import com.dongVu1105.event_service.exception.AppException;
 import com.dongVu1105.event_service.exception.ErrorCode;
 import com.dongVu1105.event_service.mapper.EventUserMapper;
+import com.dongVu1105.event_service.repository.EventRepository;
 import com.dongVu1105.event_service.repository.EventUserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +32,14 @@ public class EventUserService {
 
     EventUserMapper eventUserMapper;
     EventUserRepository eventUserRepository;
+    EventRepository eventRepository;
 
     public EventUserResponse eventRegistration (EventUserCreationRequest request){
+        Event event = eventRepository.findById(request.getEventId())
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
+        if(!event.isStatusEvent()){
+            throw new AppException(ErrorCode.UNAVAILABLE_EVENT);
+        }
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         String eventUserHash = this.hashEventUser(userId, request.getEventId());
         EventUser eventUser = eventUserRepository.findByEventUserHash(eventUserHash);
@@ -47,6 +55,11 @@ public class EventUserService {
     }
 
     public void unsubscribeEvent (String eventId){
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
+        if(!event.isStatusEvent()){
+            throw new AppException(ErrorCode.UNAVAILABLE_EVENT);
+        }
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         String eventUserHash = this.hashEventUser(userId, eventId);
         EventUser eventUser = eventUserRepository.findByEventUserHash(eventUserHash);
@@ -75,6 +88,15 @@ public class EventUserService {
     /// Cần hiện thông tin user
     @PreAuthorize("hasRole('EVENT_MANAGER')")
     public PageResponse<EventUserResponse> findAllPendingUser (int page, int size, String eventId){
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
+        if(!event.isStatusEvent()){
+            throw new AppException(ErrorCode.UNAVAILABLE_EVENT);
+        }
+        String managerId = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!event.getManagerId().equals(managerId)){
+            throw new AppException(ErrorCode.CANNOT_MODIFY_EVENT);
+        }
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<EventUser> eventUserPage = eventUserRepository.findAllByStatusAndEventId(EventUserStatus.PENDING.name(), eventId, pageable);
         var eventUserData = eventUserPage.getContent().stream().map(eventUserMapper::toEventUserResponse).toList();
@@ -92,6 +114,15 @@ public class EventUserService {
     public EventUserResponse acceptUserRegistration (String eventUserId){
         EventUser eventUser = eventUserRepository.findById(eventUserId)
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_USER_NOT_EXISTED));
+        Event event = eventRepository.findById(eventUser.getEventId())
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
+        if(!event.isStatusEvent()){
+            throw new AppException(ErrorCode.UNAVAILABLE_EVENT);
+        }
+        String managerId = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!event.getManagerId().equals(managerId)){
+            throw new AppException(ErrorCode.CANNOT_MODIFY_EVENT);
+        }
         eventUser.setStatus(EventUserStatus.ATTENDING.name());
         eventUser = eventUserRepository.save(eventUser);
         return eventUserMapper.toEventUserResponse(eventUser);
@@ -101,12 +132,30 @@ public class EventUserService {
     public void deleteUserRegistration (String eventUserId){
         EventUser eventUser = eventUserRepository.findById(eventUserId)
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_USER_NOT_EXISTED));
+        Event event = eventRepository.findById(eventUser.getEventId())
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
+        if(!event.isStatusEvent()){
+            throw new AppException(ErrorCode.UNAVAILABLE_EVENT);
+        }
+        String managerId = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!event.getManagerId().equals(managerId)){
+            throw new AppException(ErrorCode.CANNOT_MODIFY_EVENT);
+        }
         eventUserRepository.deleteById(eventUser.getId());
     }
 
     /// Cần hiện thông tin user
     @PreAuthorize("hasRole('EVENT_MANAGER')")
     public PageResponse<EventUserResponse> findAllAttendingUser (int page, int size, String eventId){
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
+        if(!event.isStatusEvent()){
+            throw new AppException(ErrorCode.UNAVAILABLE_EVENT);
+        }
+        String managerId = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!event.getManagerId().equals(managerId)){
+            throw new AppException(ErrorCode.CANNOT_MODIFY_EVENT);
+        }
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<EventUser> eventUserPage = eventUserRepository.findAllByStatusAndEventId(EventUserStatus.ATTENDING.name(), eventId, pageable);
         var eventUserData = eventUserPage.getContent().stream().map(eventUserMapper::toEventUserResponse).toList();
@@ -124,14 +173,33 @@ public class EventUserService {
     public EventUserResponse confirmUserCompletion (String eventUserId){
         EventUser eventUser = eventUserRepository.findById(eventUserId)
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_USER_NOT_EXISTED));
+        Event event = eventRepository.findById(eventUser.getEventId())
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
+        if(!event.isStatusEvent()){
+            throw new AppException(ErrorCode.UNAVAILABLE_EVENT);
+        }
+        String managerId = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!event.getManagerId().equals(managerId)){
+            throw new AppException(ErrorCode.CANNOT_MODIFY_EVENT);
+        }
         eventUser.setStatus(EventUserStatus.COMPLETED.name());
         eventUser = eventUserRepository.save(eventUser);
         return eventUserMapper.toEventUserResponse(eventUser);
     }
 
     /// Cần hiện thông tin user
+    /// Liệu user xem được không?
     @PreAuthorize("hasRole('EVENT_MANAGER')")
     public PageResponse<EventUserResponse> findAllUserInEvent (int page, int size, String eventId){
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
+        if(!event.isStatusEvent()){
+            throw new AppException(ErrorCode.UNAVAILABLE_EVENT);
+        }
+        String managerId = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!event.getManagerId().equals(managerId)){
+            throw new AppException(ErrorCode.CANNOT_MODIFY_EVENT);
+        }
         Pageable pageable = PageRequest.of(page - 1, size);
         Page<EventUser> eventUserPage = eventUserRepository.findAllByEventId(eventId, pageable);
         var eventUserData = eventUserPage.getContent().stream().map(eventUserMapper::toEventUserResponse).toList();

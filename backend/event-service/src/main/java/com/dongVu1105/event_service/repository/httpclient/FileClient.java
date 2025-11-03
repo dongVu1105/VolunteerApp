@@ -14,6 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
         url = "${app.services.file}",
         configuration = {AuthenticationRequestInterceptor.class, FeignConfiguration.class})
 public interface FileClient {
-    @PostMapping(value = "/media/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/internal/media/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ApiResponse<FileResponse> uploadMedia (@RequestPart("file") MultipartFile file);
 }

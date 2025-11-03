@@ -20,24 +20,23 @@ import org.springframework.web.multipart.MultipartFile;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EventController {
     EventService eventService;
+    ObjectMapper objectMapper;
 
     // Quản lí sự kiện tạo event
-    @PostMapping
+    @PostMapping("/create")
     public ApiResponse<EventResponse> create (
             @RequestPart(value = "request") String requestJson,
             @RequestPart(value = "file", required = false)MultipartFile file) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        EventCreationRequest request = mapper.readValue(requestJson, EventCreationRequest.class);
+        EventCreationRequest request = objectMapper.readValue(requestJson, EventCreationRequest.class);
         return ApiResponse.<EventResponse>builder().data(eventService.create(request, file)).build();
     }
 
     // Quản lí sự kiện sửa event
-    @PutMapping
+    @PutMapping("/update")
     public ApiResponse<EventResponse> update (
             @RequestPart(value = "request") String requestJson,
             @RequestPart(value = "file", required = false) MultipartFile file) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        EventUpdationRequest request = mapper.readValue(requestJson, EventUpdationRequest.class);
+        EventUpdationRequest request = objectMapper.readValue(requestJson, EventUpdationRequest.class);
         return ApiResponse.<EventResponse>builder().data(eventService.update(request, file)).build();
     }
 
@@ -47,6 +46,7 @@ public class EventController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size,
             @RequestParam(value = "category", required = false, defaultValue = "Từ thiện") String category){
+        System.out.println(category);
         return ApiResponse.<PageResponse<EventResponse>>builder()
                 .data(eventService.findAllByCategory(page, size, category)).build();
     }
@@ -67,13 +67,13 @@ public class EventController {
     }
 
     // Admin chấp nhận event
-    @PostMapping("/{eventId}")
+    @PostMapping("/accept/{eventId}")
     public ApiResponse<EventResponse> acceptEvent (@PathVariable("eventId") String eventId){
         return ApiResponse.<EventResponse>builder().data(eventService.acceptEvent(eventId)).build();
     }
 
     // Admin xóa event
-    @DeleteMapping("/{eventId}")
+    @DeleteMapping("/delete/{eventId}")
     public ApiResponse<Void> delete (@PathVariable("eventId") String eventId){
         eventService.delete(eventId);
         return ApiResponse.<Void>builder().build();
