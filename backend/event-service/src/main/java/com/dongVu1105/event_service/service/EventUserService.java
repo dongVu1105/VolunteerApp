@@ -1,6 +1,8 @@
 package com.dongVu1105.event_service.service;
 
+import com.dongVu1105.event_service.dto.request.EventNoti;
 import com.dongVu1105.event_service.dto.request.EventUserCreationRequest;
+import com.dongVu1105.event_service.dto.request.EventUserNoti;
 import com.dongVu1105.event_service.dto.response.*;
 import com.dongVu1105.event_service.entity.Event;
 import com.dongVu1105.event_service.entity.EventUser;
@@ -10,12 +12,15 @@ import com.dongVu1105.event_service.exception.ErrorCode;
 import com.dongVu1105.event_service.mapper.EventUserMapper;
 import com.dongVu1105.event_service.repository.EventRepository;
 import com.dongVu1105.event_service.repository.EventUserRepository;
+import com.dongVu1105.event_service.repository.httpclient.UserProfileClient;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -28,11 +33,14 @@ import java.util.StringJoiner;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class EventUserService {
 
     EventUserMapper eventUserMapper;
     EventUserRepository eventUserRepository;
     EventRepository eventRepository;
+    KafkaTemplate<String, Object> kafkaTemplate;
+    UserProfileClient userProfileClient;
 
     public EventUserResponse eventRegistration (EventUserCreationRequest request){
         Event event = eventRepository.findById(request.getEventId())
@@ -51,6 +59,16 @@ public class EventUserService {
         newEventUser.setUserId(userId);
         newEventUser.setStatus(EventUserStatus.PENDING.name());
         newEventUser = eventUserRepository.save(newEventUser);
+        UserProfileResponse userProfileResponse = userProfileClient.findById(userId).getData();
+        if(Objects.isNull(userProfileResponse)){
+            log.error(ErrorCode.UNCONNECTED_SERVICE.getMessage());
+        }
+        kafkaTemplate.send("register-event", EventUserNoti.builder()
+                .eventUserId(newEventUser.getId())
+                .eventTitle(event.getTitle())
+                .username(userProfileResponse.getUsername())
+                .receiverId(event.getManagerId())
+                .build());
         return eventUserMapper.toEventUserResponse(newEventUser);
     }
 
@@ -110,6 +128,20 @@ public class EventUserService {
                 .build();
     }
 
+    /// admin co can xem khong?
+    @PreAuthorize("hasRole('EVENT_MANAGER')")
+    public EventUserResponse findById (String eventUserId){
+        EventUser eventUser = eventUserRepository.findById(eventUserId)
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_USER_NOT_EXISTED));
+        Event event = eventRepository.findById(eventUser.getEventId())
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
+        String managerId = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!event.getManagerId().equals(managerId)){
+            throw new AppException(ErrorCode.CANNOT_MODIFY_EVENT);
+        }
+        return eventUserMapper.toEventUserResponse(eventUser);
+    }
+
     @PreAuthorize("hasRole('EVENT_MANAGER')")
     public EventUserResponse acceptUserRegistration (String eventUserId){
         EventUser eventUser = eventUserRepository.findById(eventUserId)
@@ -125,6 +157,12 @@ public class EventUserService {
         }
         eventUser.setStatus(EventUserStatus.ATTENDING.name());
         eventUser = eventUserRepository.save(eventUser);
+        kafkaTemplate.send("accept-register",
+                EventNoti.builder()
+                        .eventId(event.getId())
+                        .eventTitle(event.getTitle())
+                        .receiverId(eventUser.getUserId())
+                        .build());
         return eventUserMapper.toEventUserResponse(eventUser);
     }
 
@@ -141,6 +179,12 @@ public class EventUserService {
         if (!event.getManagerId().equals(managerId)){
             throw new AppException(ErrorCode.CANNOT_MODIFY_EVENT);
         }
+        kafkaTemplate.send("reject-register",
+                EventNoti.builder()
+                        .eventId(event.getId())
+                        .eventTitle(event.getTitle())
+                        .receiverId(eventUser.getUserId())
+                        .build());
         eventUserRepository.deleteById(eventUser.getId());
     }
 
@@ -184,6 +228,12 @@ public class EventUserService {
         }
         eventUser.setStatus(EventUserStatus.COMPLETED.name());
         eventUser = eventUserRepository.save(eventUser);
+        kafkaTemplate.send("confirm-completion",
+                EventNoti.builder()
+                        .eventId(event.getId())
+                        .eventTitle(event.getTitle())
+                        .receiverId(eventUser.getUserId())
+                        .build());
         return eventUserMapper.toEventUserResponse(eventUser);
     }
 

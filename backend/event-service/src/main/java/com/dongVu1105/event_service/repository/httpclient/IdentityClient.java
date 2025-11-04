@@ -12,4 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface IdentityClient {
     @GetMapping("/user/find-by-id/{id}")
     ApiResponse<UserResponse> findById (@PathVariable("id") String id);
+
+    @GetMapping("/find-by-email/{email}")
+    ApiResponse<UserResponse> findByEmail (@PathVariable("email") String email);
 }
