@@ -27,4 +27,9 @@ public class UserController {
     public ApiResponse<UserResponse> findById (@PathVariable("id") String id){
         return ApiResponse.<UserResponse>builder().data(userService.findById(id)).build();
     }
+
+    @GetMapping("/find-by-email/{email}")
+    public ApiResponse<UserResponse> findByEmail (@PathVariable("email") String email){
+        return ApiResponse.<UserResponse>builder().data(userService.findByEmail(email)).build();
+    }
 }

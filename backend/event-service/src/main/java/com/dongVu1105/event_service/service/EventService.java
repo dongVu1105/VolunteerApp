@@ -1,6 +1,7 @@
 package com.dongVu1105.event_service.service;
 
 import com.dongVu1105.event_service.dto.request.EventCreationRequest;
+import com.dongVu1105.event_service.dto.request.EventNoti;
 import com.dongVu1105.event_service.dto.request.EventUpdationRequest;
 import com.dongVu1105.event_service.dto.request.EventUserCreationRequest;
 import com.dongVu1105.event_service.dto.response.*;
@@ -24,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -45,6 +47,7 @@ public class EventService {
     DateTimeFormatter dateTimeFormatter;
     IdentityClient identityClient;
     FileClient fileClient;
+    KafkaTemplate<String, Object> kafkaTemplate;
 
     @PreAuthorize("hasRole('EVENT_MANAGER')")
     public EventResponse create (EventCreationRequest request, MultipartFile file){
@@ -56,6 +59,9 @@ public class EventService {
         event.setImage(fileResponse.getUrl());
         event.setStatusEvent(false);
         event = eventRepository.save(event);
+        UserResponse admin = identityClient.findByEmail(ADMIN_EMAIL).getData();
+        kafkaTemplate.send("new-event",
+                EventNoti.builder().eventId(event.getId()).eventTitle(event.getTitle()).receiverId(admin.getId()).build());
         return this.toEventResponse(event);
     }
 
@@ -78,6 +84,8 @@ public class EventService {
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
         event.setStatusEvent(true);
         event = eventRepository.save(event);
+        kafkaTemplate.send("accept-event",
+                EventNoti.builder().eventId(event.getId()).eventTitle(event.getTitle()).receiverId(event.getManagerId()).build());
         return this.toEventResponse(event);
     }
 
@@ -92,6 +100,9 @@ public class EventService {
         }
         if(!(userId.equals(event.getManagerId()) || admin.getEmail().equals(ADMIN_EMAIL))){
             throw new AppException(ErrorCode.CANNOT_DELETE_EVENT);
+        }
+        if (admin.getEmail().equals(ADMIN_EMAIL)){
+            kafkaTemplate.send("reject-event", eventMapper.toEventResponse(event));
         }
         eventRepository.deleteById(eventId);
     }

@@ -11,3 +11,21 @@ spring:
     mongodb:
       uri: mongodb://root:root@localhost:27017/notification-service?authSource=admin
       auto-index-creation: true
+  kafka:
+    bootstrap-servers: localhost:9094
+    consumer:
+      group-id: notification-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.type.mapping: com.dongVu1105.event_service.dto.request.EventNoti:com.dongVu1105.notification_service.dto.request.EventNoti, com.dongVu1105.event_service.dto.request.EventUserNoti:com.dongVu1105.notification_service.dto.request.EventUserNoti, com.dongVu1105.event_service.dto.response.EventResponse:com.dongVu1105.notification_service.dto.request.EventResponse
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+
+app:
+  services:
+    identity :
+      url: http://localhost:8080/identity
+    event:
+      url: http://localhost:8084/event

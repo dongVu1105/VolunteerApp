@@ -10,15 +10,14 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/internal")
+@RequestMapping("user")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class InternalProfileController {
+public class ProfileController {
     UserProfileService userProfileService;
 
-    @PostMapping("/user")
-    public ApiResponse<UserProfileResponse> create (@RequestBody ProfileCreationRequest request){
-        return ApiResponse.<UserProfileResponse>builder()
-                .data(userProfileService.create(request)).build();
+    @GetMapping("/{userId}")
+    public ApiResponse<UserProfileResponse> findById (@PathVariable("userId") String userId){
+        return ApiResponse.<UserProfileResponse>builder().data(userProfileService.findByUserId(userId)).build();
     }
 }

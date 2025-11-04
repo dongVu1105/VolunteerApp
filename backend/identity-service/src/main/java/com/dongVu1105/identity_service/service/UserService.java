@@ -73,5 +73,11 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
 
+    public UserResponse findByEmail (String email){
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        return userMapper.toUserResponse(user);
+    }
+
 
 }

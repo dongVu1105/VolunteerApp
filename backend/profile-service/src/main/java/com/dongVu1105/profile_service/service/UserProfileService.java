@@ -28,4 +28,8 @@ public class UserProfileService {
         userProfile.setAvatar(DEFAULT_AVATAR);
         return userProfileMapper.toUserProfileResponse(userProfileRepository.save(userProfile));
     }
+
+    public UserProfileResponse findByUserId (String userId){
+        return userProfileMapper.toUserProfileResponse(userProfileRepository.findByUserId(userId));
+    }
 }

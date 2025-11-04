@@ -67,7 +67,7 @@ public class EventController {
     }
 
     // Admin chấp nhận event
-    @PostMapping("/accept/{eventId}")
+    @PutMapping("/accept/{eventId}")
     public ApiResponse<EventResponse> acceptEvent (@PathVariable("eventId") String eventId){
         return ApiResponse.<EventResponse>builder().data(eventService.acceptEvent(eventId)).build();
     }

@@ -11,10 +11,16 @@ spring:
     mongodb:
       uri: mongodb://root:root@localhost:27017/event-service?authSource=admin
       auto-index-creation: true
+  kafka:
+    bootstrap-servers: localhost:9094
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 app:
   services:
     identity: http://localhost:8080/identity
     file: http://localhost:8082/file
+    profile: http://localhost:8081/profile
   account:
     admin: admin@gmail.com

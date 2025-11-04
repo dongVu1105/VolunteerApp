@@ -65,6 +65,12 @@ public class EventUserController {
         return ApiResponse.<Void>builder().build();
     }
 
+    // Quản lí sự kiện tìm id của eventUser
+    @GetMapping("/{eventUserId}")
+    public ApiResponse<EventUserResponse> findById (@PathVariable("eventUserId") String eventUserId){
+        return ApiResponse.<EventUserResponse>builder().data(eventUserService.findById(eventUserId)).build();
+    }
+
     // Quản lí sự kiện xác nhận hoàn thành cho người tham gia
     @PutMapping("/confirm-completion/{eventUserId}")
     public ApiResponse<EventUserResponse> confirmUserCompletion (
