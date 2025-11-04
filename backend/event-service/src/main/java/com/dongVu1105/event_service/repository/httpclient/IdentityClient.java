@@ -13,6 +13,6 @@ public interface IdentityClient {
     @GetMapping("/user/find-by-id/{id}")
     ApiResponse<UserResponse> findById (@PathVariable("id") String id);
 
-    @GetMapping("/find-by-email/{email}")
+    @GetMapping("/user/find-by-email/{email}")
     ApiResponse<UserResponse> findByEmail (@PathVariable("email") String email);
 }

@@ -3,6 +3,7 @@ package com.dongVu1105.notification_service.service;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.dongVu1105.notification_service.constant.PredefinedNotification;
 import com.dongVu1105.notification_service.dto.request.EventNoti;
+import com.dongVu1105.notification_service.dto.request.EventResponse;
 import com.dongVu1105.notification_service.dto.request.EventUserNoti;
 import com.dongVu1105.notification_service.dto.response.EventInfo;
 import com.dongVu1105.notification_service.dto.response.EventUserInfo;
@@ -109,6 +110,31 @@ public class NotificationService {
                 .build();
         Notification<EventUserInfo> finalNotification = notificationRepository.save(notification);
         WebSocketSession webSocketSession = webSocketSessionRepository.findByUserId(eventUserNoti.getReceiverId());
+        if(Objects.nonNull(webSocketSession)){
+            socketIOServer.getAllClients().forEach(socketIOClient -> {
+                if(socketIOClient.getSessionId().toString().equals(webSocketSession.getSocketSessionId())){
+                    String noti = null;
+                    try {
+                        noti = objectMapper.writeValueAsString(finalNotification);
+                        socketIOClient.sendEvent("event-manager-noti", noti);
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+        }
+    }
+
+
+    public void sendEventManagerForReject(EventResponse eventResponse, PredefinedNotification predefinedNotification) {
+        Notification<EventResponse> notification = Notification.<EventResponse>builder()
+                .subject(predefinedNotification.getSubject())
+                .message(predefinedNotification.getContent() + eventResponse.getTitle())
+                .info(eventResponse)
+                .receiverId(eventResponse.getManagerId())
+                .build();
+        Notification<EventResponse> finalNotification = notificationRepository.save(notification);
+        WebSocketSession webSocketSession = webSocketSessionRepository.findByUserId(eventResponse.getManagerId());
         if(Objects.nonNull(webSocketSession)){
             socketIOServer.getAllClients().forEach(socketIOClient -> {
                 if(socketIOClient.getSessionId().toString().equals(webSocketSession.getSocketSessionId())){

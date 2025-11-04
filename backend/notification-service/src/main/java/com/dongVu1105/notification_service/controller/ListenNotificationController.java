@@ -4,6 +4,7 @@ package com.dongVu1105.notification_service.controller;
 
 import com.dongVu1105.notification_service.constant.PredefinedNotification;
 import com.dongVu1105.notification_service.dto.request.EventNoti;
+import com.dongVu1105.notification_service.dto.request.EventResponse;
 import com.dongVu1105.notification_service.dto.request.EventUserNoti;
 import com.dongVu1105.notification_service.service.NotificationService;
 import lombok.AccessLevel;
@@ -29,12 +30,13 @@ public class ListenNotificationController {
     }
 
     @KafkaListener(topics = "reject-event")
-    public void listenRejectEventNotification(EventNoti eventNoti){
-        notificationService.sendEventManager(eventNoti, PredefinedNotification.REJECT_EVENT);
+    public void listenRejectEventNotification(EventResponse eventResponse){
+        notificationService.sendEventManagerForReject(eventResponse, PredefinedNotification.REJECT_EVENT);
     }
 
     @KafkaListener(topics = "register-event")
     public void listenRegisterEventNotification(EventUserNoti eventUserNoti){
+
         notificationService.sendEventManagerForRegister(eventUserNoti, PredefinedNotification.NEW_REGISTER);
     }
 
@@ -50,7 +52,7 @@ public class ListenNotificationController {
 
     @KafkaListener(topics = "confirm-completion")
     public void listenConfirmCompletionNotification(EventNoti eventNoti){
-        notificationService.sendUser(eventNoti, PredefinedNotification.ACCEPT_REGISTER);
+        notificationService.sendUser(eventNoti, PredefinedNotification.CONFIRM_COMPLETION);
     }
 
 }
