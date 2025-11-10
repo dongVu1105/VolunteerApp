@@ -13,4 +13,5 @@ public interface EventUserRepository extends MongoRepository<EventUser, String> 
     Page<EventUser> findAllByStatusAndUserId (String status, String userId, Pageable pageable);
     Page<EventUser> findAllByEventId (String eventId, Pageable pageable);
     Page<EventUser> findAllByStatusAndEventId (String status, String eventId, Pageable pageable);
+    Boolean existsByUserIdAndEventId (String userId, String eventId);
 }

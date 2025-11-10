@@ -8,6 +8,7 @@ import com.dongVu1105.event_service.service.EventUserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.apache.kafka.shaded.com.google.protobuf.Api;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -99,6 +100,12 @@ public class EventUserController {
                 .data(eventUserService.findAllUserInEvent(page, size, eventId)).build();
     }
 
-
+    // Kiem tra user co trong event hay khong
+    @GetMapping("/exist/{userId}/{eventId}")
+    public ApiResponse<Boolean> isUserInEvent (
+            @PathVariable("userId") String userId,
+            @PathVariable("eventId") String eventId){
+        return ApiResponse.<Boolean>builder().data(eventUserService.isInEvent(userId, eventId)).build();
+    }
 
 }

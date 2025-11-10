@@ -128,6 +128,12 @@ public class EventUserService {
                 .build();
     }
 
+    public Boolean isInEvent (String userId, String eventId){
+        String eventUserHash = this.hashEventUser(userId, eventId);
+        EventUser eventUser = eventUserRepository.findByEventUserHash(eventUserHash);
+        return Objects.nonNull(eventUser);
+    }
+
     /// admin co can xem khong?
     @PreAuthorize("hasRole('EVENT_MANAGER')")
     public EventUserResponse findById (String eventUserId){

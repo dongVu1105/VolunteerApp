@@ -15,4 +15,4 @@ spring:
 app:
   services:
     file:
-      default-avatar: fill-avatar-image-link
+      default-avatar: http://localhost:8888/api/v1/file/media/download/9faaaad8-359f-4cc8-b5da-8194dc0e23db.jpg

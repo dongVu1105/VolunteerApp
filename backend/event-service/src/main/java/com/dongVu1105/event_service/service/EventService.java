@@ -112,6 +112,11 @@ public class EventService {
                 () -> new AppException(ErrorCode.EVENT_NOT_EXISTED) ));
     }
 
+    public Boolean ableToPost (String eventId){
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
+        return event.isStatusEvent();
+    }
     /// Cần thêm lọc theo thời gian
     public PageResponse<EventResponse> findAllByCategory (int page, int size, String category){
         Sort sort = Sort.by("createdDate").descending();
