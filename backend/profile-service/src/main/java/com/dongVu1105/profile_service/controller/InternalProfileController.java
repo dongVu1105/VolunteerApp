@@ -21,4 +21,9 @@ public class InternalProfileController {
         return ApiResponse.<UserProfileResponse>builder()
                 .data(userProfileService.create(request)).build();
     }
+
+    @GetMapping("/{userId}")
+    public ApiResponse<UserProfileResponse> findById (@PathVariable("userId") String userId){
+        return ApiResponse.<UserProfileResponse>builder().data(userProfileService.findByUserId(userId)).build();
+    }
 }

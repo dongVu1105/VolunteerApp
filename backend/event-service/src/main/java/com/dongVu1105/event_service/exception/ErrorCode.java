@@ -20,7 +20,9 @@ public enum ErrorCode {
     USER_NOT_REGISTERED(1014, "Oops!: You didn't register.", HttpStatus.BAD_REQUEST),
     EVENT_USER_NOT_EXISTED (1015, "this user has not attend this event", HttpStatus.NOT_FOUND),
     UNAVAILABLE_EVENT (1016, "event has not accepted by admin", HttpStatus.BAD_REQUEST),
-    CANNOT_MODIFY_EVENT (1017, "Only the event manager can modify this event", HttpStatus.BAD_REQUEST)
+    CANNOT_MODIFY_EVENT (1017, "Only the event manager can modify this event", HttpStatus.BAD_REQUEST),
+    CANNOT_UNSUBSCRIBE_EVENT(1018, "Event is ongoing, you cannot unsubscribe", HttpStatus.BAD_REQUEST),
+    FINISHED_EVENT(1018, "Event finished", HttpStatus.BAD_REQUEST)
     ;
 
     private final int code;

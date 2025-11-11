@@ -2,6 +2,7 @@ package com.dongVu1105.identity_service.controller;
 
 import com.dongVu1105.identity_service.dto.ApiResponse;
 import com.dongVu1105.identity_service.dto.request.UserCreationRequest;
+import com.dongVu1105.identity_service.dto.response.RoleResponse;
 import com.dongVu1105.identity_service.dto.response.UserResponse;
 import com.dongVu1105.identity_service.service.UserService;
 import lombok.AccessLevel;
@@ -9,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -31,5 +34,10 @@ public class UserController {
     @GetMapping("/find-by-email/{email}")
     public ApiResponse<UserResponse> findByEmail (@PathVariable("email") String email){
         return ApiResponse.<UserResponse>builder().data(userService.findByEmail(email)).build();
+    }
+
+    @GetMapping("/role")
+    public ApiResponse<List<RoleResponse>> findAll (){
+        return ApiResponse.<List<RoleResponse>>builder().data(userService.findAll()).build();
     }
 }

@@ -57,6 +57,11 @@ public class EventController {
         return ApiResponse.<EventResponse>builder().data(eventService.findById(eventId)).build();
     }
 
+    @GetMapping("/status/{eventId}")
+    public ApiResponse<Boolean> ableToPost (@PathVariable("eventId") String eventId){
+        return ApiResponse.<Boolean>builder().data(eventService.ableToPost(eventId)).build();
+    }
+
     // Admin tìm các sự kiện chưa được chấp nhận
     @GetMapping("/pending")
     public ApiResponse<PageResponse<EventResponse>> findAllPendingEvent (

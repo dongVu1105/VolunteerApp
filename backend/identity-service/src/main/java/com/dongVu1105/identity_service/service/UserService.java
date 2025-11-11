@@ -3,6 +3,7 @@ package com.dongVu1105.identity_service.service;
 import com.dongVu1105.identity_service.constant.PredefinedRole;
 import com.dongVu1105.identity_service.dto.request.ProfileCreationRequest;
 import com.dongVu1105.identity_service.dto.request.UserCreationRequest;
+import com.dongVu1105.identity_service.dto.response.RoleResponse;
 import com.dongVu1105.identity_service.dto.response.UserProfileResponse;
 import com.dongVu1105.identity_service.dto.response.UserResponse;
 import com.dongVu1105.identity_service.entity.Role;
@@ -10,6 +11,7 @@ import com.dongVu1105.identity_service.entity.User;
 import com.dongVu1105.identity_service.exception.AppException;
 import com.dongVu1105.identity_service.exception.ErrorCode;
 import com.dongVu1105.identity_service.mapper.ProfileMapper;
+import com.dongVu1105.identity_service.mapper.RoleMapper;
 import com.dongVu1105.identity_service.mapper.UserMapper;
 import com.dongVu1105.identity_service.repository.RoleRepository;
 import com.dongVu1105.identity_service.repository.UserRepository;
@@ -23,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -36,6 +39,7 @@ public class UserService {
     RoleRepository roleRepository;
     UserProfileClient userProfileClient;
     ProfileMapper profileMapper;
+    RoleMapper roleMapper;
 
     public UserResponse create (UserCreationRequest request){
         User user = userMapper.toUser(request);
@@ -77,6 +81,11 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         return userMapper.toUserResponse(user);
+    }
+
+    public List<RoleResponse> findAll (){
+        return roleRepository.findAll().stream()
+                .filter(role -> !role.getName().equals(PredefinedRole.ADMIN_ROLE)).map(roleMapper::toRoleResponse).toList();
     }
 
 
