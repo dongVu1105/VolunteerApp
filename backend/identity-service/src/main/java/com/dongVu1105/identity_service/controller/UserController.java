@@ -2,6 +2,8 @@ package com.dongVu1105.identity_service.controller;
 
 import com.dongVu1105.identity_service.dto.ApiResponse;
 import com.dongVu1105.identity_service.dto.request.UserCreationRequest;
+import com.dongVu1105.identity_service.dto.response.AccountResponse;
+import com.dongVu1105.identity_service.dto.response.PageResponse;
 import com.dongVu1105.identity_service.dto.response.RoleResponse;
 import com.dongVu1105.identity_service.dto.response.UserResponse;
 import com.dongVu1105.identity_service.service.UserService;
@@ -39,5 +41,23 @@ public class UserController {
     @GetMapping("/role")
     public ApiResponse<List<RoleResponse>> findAll (){
         return ApiResponse.<List<RoleResponse>>builder().data(userService.findAll()).build();
+    }
+
+    @PutMapping("/lock/{userId}")
+    public ApiResponse<AccountResponse> lockAccount (@PathVariable("userId") String userId){
+        return ApiResponse.<AccountResponse>builder().data(userService.lockAccount(userId)).build();
+    }
+
+    @PutMapping("/unlock/{userId}")
+    public ApiResponse<AccountResponse> unLockAccount (@PathVariable("userId") String userId){
+        return ApiResponse.<AccountResponse>builder().data(userService.unLockAccount(userId)).build();
+    }
+
+    @GetMapping("/find-all-account")
+    public ApiResponse<PageResponse<AccountResponse>> findAllAccount (
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size){
+        return ApiResponse.<PageResponse<AccountResponse>>builder()
+                .data(userService.findAllAccount(page, size)).build();
     }
 }
