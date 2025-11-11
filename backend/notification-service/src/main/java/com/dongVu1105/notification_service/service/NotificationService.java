@@ -5,10 +5,13 @@ import com.dongVu1105.notification_service.constant.PredefinedNotification;
 import com.dongVu1105.notification_service.dto.request.*;
 import com.dongVu1105.notification_service.dto.response.EventInfo;
 import com.dongVu1105.notification_service.dto.response.EventUserInfo;
+import com.dongVu1105.notification_service.dto.response.NotificationResponse;
+import com.dongVu1105.notification_service.dto.response.PageResponse;
 import com.dongVu1105.notification_service.entity.Notification;
 import com.dongVu1105.notification_service.entity.WebSocketSession;
 import com.dongVu1105.notification_service.exception.AppException;
 import com.dongVu1105.notification_service.exception.ErrorCode;
+import com.dongVu1105.notification_service.mapper.NotificationMapper;
 import com.dongVu1105.notification_service.repository.NotificationRepository;
 import com.dongVu1105.notification_service.repository.WebSocketSessionRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -17,8 +20,14 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -33,6 +42,8 @@ public class NotificationService {
     SocketIOServer socketIOServer;
     WebSocketSessionRepository webSocketSessionRepository;
     ObjectMapper objectMapper;
+    NotificationMapper notificationMapper;
+    DateTimeFormatter dateTimeFormatter;
 
     public void sendUser (EventNoti eventNoti, PredefinedNotification predefinedNotification){
         Notification<EventInfo> notification = Notification.<EventInfo>builder()
@@ -40,6 +51,7 @@ public class NotificationService {
                 .message(predefinedNotification.getContent() + eventNoti.getEventTitle())
                 .info(EventInfo.builder().eventId(eventNoti.getEventId()).build())
                 .receiverId(List.of(eventNoti.getReceiverId()))
+                .createdDate(Instant.now())
                 .build();
         Notification<EventInfo> finalNotification = notificationRepository.save(notification);
         WebSocketSession webSocketSession = webSocketSessionRepository.findByUserId(
@@ -66,6 +78,7 @@ public class NotificationService {
                 .message(predefinedNotification.getContent() + eventNoti.getEventTitle())
                 .info(EventInfo.builder().eventId(eventNoti.getEventId()).build())
                 .receiverId(List.of(eventNoti.getReceiverId()))
+                .createdDate(Instant.now())
                 .build();
         Notification<EventInfo> finalNotification = notificationRepository.save(notification);
         WebSocketSession webSocketSession = webSocketSessionRepository.findByUserId(
@@ -92,6 +105,7 @@ public class NotificationService {
                 .message(predefinedNotification.getContent() + eventNoti.getEventTitle())
                 .info(EventInfo.builder().eventId(eventNoti.getEventId()).build())
                 .receiverId(List.of(eventNoti.getReceiverId()))
+                .createdDate(Instant.now())
                 .build();
         Notification<EventInfo> finalNotification = notificationRepository.save(notification);
         WebSocketSession webSocketSession = webSocketSessionRepository.findByUserId(
@@ -118,6 +132,7 @@ public class NotificationService {
                 .message(eventUserNoti.getUsername() + predefinedNotification.getContent())
                 .info(EventUserInfo.builder().eventUserId(eventUserNoti.getEventUserId()).build())
                 .receiverId(List.of(eventUserNoti.getReceiverId()))
+                .createdDate(Instant.now())
                 .build();
         Notification<EventUserInfo> finalNotification = notificationRepository.save(notification);
         WebSocketSession webSocketSession = webSocketSessionRepository.findByUserId(
@@ -145,6 +160,7 @@ public class NotificationService {
                 .message(predefinedNotification.getContent() + eventResponse.getTitle())
                 .info(eventResponse)
                 .receiverId(List.of(eventResponse.getManagerId()))
+                .createdDate(Instant.now())
                 .build();
         Notification<EventResponse> finalNotification = notificationRepository.save(notification);
         WebSocketSession webSocketSession = webSocketSessionRepository.findByUserId(
@@ -171,6 +187,7 @@ public class NotificationService {
                 .message(postNoti.getCreatorName() +predefinedNotification.getContent())
                 .info(postNoti)
                 .receiverId(postNoti.getReceiverId())
+                .createdDate(Instant.now())
                 .build();
         Notification<PostNoti> finalNotification = notificationRepository.save(notification);
         System.out.println("finalNotification.getReceiverId(): "+ finalNotification.getReceiverId());
@@ -200,5 +217,25 @@ public class NotificationService {
                 }
             }
         });
+    }
+
+    public PageResponse<NotificationResponse> findAllByUserId ( int page, int size){
+        Sort sort = Sort.by("createdDate").descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Page<Notification> notificationPage = notificationRepository.findAllByReceiverIdContains(userId, pageable);
+        var notiData = notificationPage.getContent().stream().map(this::toNotificationResponse).toList();
+        return PageResponse.<NotificationResponse>builder()
+                .currentPage(page)
+                .pageSize(notificationPage.getSize())
+                .totalElements(notificationPage.getTotalElements())
+                .totalPages(notificationPage.getTotalPages())
+                .result(notiData).build();
+    }
+
+    private NotificationResponse toNotificationResponse (Notification notification){
+        NotificationResponse notificationResponse = notificationMapper.toNotificationResponse(notification);
+        notificationResponse.setCreatedDate(dateTimeFormatter.format(notification.getCreatedDate()));
+        return notificationResponse;
     }
 }

@@ -1,4 +1,4 @@
-package com.dongVu1105.notification_service.entity;
+package com.dongVu1105.notification_service.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -13,13 +13,11 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Document("notification")
-public class Notification <T> {
-    @MongoId
+public class NotificationResponse<T> {
     String id;
     String subject;
     String message;
     List<String> receiverId;
     T info;
-    Instant createdDate;
+    String createdDate;
 }
