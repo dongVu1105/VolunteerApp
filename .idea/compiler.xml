@@ -24,9 +24,9 @@
         </processorPath>
         <module name="post-service" />
         <module name="profile-service" />
-        <module name="event-service" />
-        <module name="file-service" />
         <module name="identity-service" />
+        <module name="file-service" />
+        <module name="event-service" />
         <module name="notification-service" />
       </profile>
     </annotationProcessing>

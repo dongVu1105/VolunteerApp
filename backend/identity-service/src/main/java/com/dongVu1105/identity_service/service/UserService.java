@@ -3,9 +3,7 @@ package com.dongVu1105.identity_service.service;
 import com.dongVu1105.identity_service.constant.PredefinedRole;
 import com.dongVu1105.identity_service.dto.request.ProfileCreationRequest;
 import com.dongVu1105.identity_service.dto.request.UserCreationRequest;
-import com.dongVu1105.identity_service.dto.response.RoleResponse;
-import com.dongVu1105.identity_service.dto.response.UserProfileResponse;
-import com.dongVu1105.identity_service.dto.response.UserResponse;
+import com.dongVu1105.identity_service.dto.response.*;
 import com.dongVu1105.identity_service.entity.Role;
 import com.dongVu1105.identity_service.entity.User;
 import com.dongVu1105.identity_service.exception.AppException;
@@ -21,6 +19,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -86,6 +89,39 @@ public class UserService {
     public List<RoleResponse> findAll (){
         return roleRepository.findAll().stream()
                 .filter(role -> !role.getName().equals(PredefinedRole.ADMIN_ROLE)).map(roleMapper::toRoleResponse).toList();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public AccountResponse lockAccount (String userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        user.setStatusAccount(false);
+        user = userRepository.save(user);
+        return userMapper.toAccountResponse(user);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public AccountResponse unLockAccount (String userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        user.setStatusAccount(true);
+        user = userRepository.save(user);
+        return userMapper.toAccountResponse(user);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public PageResponse<AccountResponse> findAllAccount (int page, int size){
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<User> userPage = userRepository.findAll(pageable);
+        var userData = userPage.getContent().stream().map(userMapper::toAccountResponse).toList();
+
+        return PageResponse.<AccountResponse>builder()
+                .currentPage(page)
+                .pageSize(userPage.getSize())
+                .totalPages(userPage.getTotalPages())
+                .totalElements(userPage.getTotalElements())
+                .result(userData)
+                .build();
     }
 
 
