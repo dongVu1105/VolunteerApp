@@ -1,21 +1,21 @@
 package com.dongVu1105.post_service.service;
 
 import com.dongVu1105.post_service.dto.request.CommentRequest;
-import com.dongVu1105.post_service.dto.request.ReactNoti;
+import com.dongVu1105.post_service.dto.request.PostNoti;
 import com.dongVu1105.post_service.dto.response.CommentResponse;
 import com.dongVu1105.post_service.dto.response.EventResponse;
 import com.dongVu1105.post_service.dto.response.PageResponse;
-import com.dongVu1105.post_service.dto.response.PostResponse;
+import com.dongVu1105.post_service.dto.response.UserProfileResponse;
 import com.dongVu1105.post_service.entity.Comment;
 import com.dongVu1105.post_service.entity.Post;
 import com.dongVu1105.post_service.exception.AppException;
 import com.dongVu1105.post_service.exception.ErrorCode;
 import com.dongVu1105.post_service.mapper.CommentMapper;
-import com.dongVu1105.post_service.mapper.PostMapper;
 import com.dongVu1105.post_service.repository.CommentRepository;
 import com.dongVu1105.post_service.repository.PostRepository;
 import com.dongVu1105.post_service.repository.httpClient.EventClient;
 import com.dongVu1105.post_service.repository.httpClient.FileClient;
+import com.dongVu1105.post_service.repository.httpClient.UserProfileClient;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -30,6 +30,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -44,6 +46,7 @@ public class CommentService {
     CommentMapper commentMapper;
     CommentRepository commentRepository;
     KafkaTemplate<String, Object> kafkaTemplate;
+    UserProfileClient userProfileClient;
 
     public CommentResponse create (MultipartFile file, CommentRequest request){
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -56,12 +59,19 @@ public class CommentService {
         comment.setCreatedDate(Instant.now());
         comment.setOwnerId(userId);
         comment = commentRepository.save(comment);
-        kafkaTemplate.send("comment", ReactNoti.builder()
-                .managerId(managerId)
-                .creator(userId)
-                .ownerId(post.getOwnerId())
-                .eventId(post.getEventId())
+        List<String> receiverId = new ArrayList<>();
+        receiverId.add(post.getOwnerId());
+        receiverId.add(managerId);
+        UserProfileResponse userProfileResponse = userProfileClient.findById(userId).getData();
+        if(Objects.isNull(userProfileResponse)){
+            log.error(ErrorCode.UNCONNECTED_SERVICE.getMessage());
+        }
+        kafkaTemplate.send("comment", PostNoti.builder()
                 .postId(post.getId())
+                .creatorName(userProfileResponse.getUsername())
+                .creatorId(userId)
+                .eventId(post.getEventId())
+                .receiverId(receiverId)
                 .build());
         return toCommentResponse(comment);
     }

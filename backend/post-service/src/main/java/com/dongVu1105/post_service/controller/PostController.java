@@ -44,4 +44,9 @@ public class PostController {
         return ApiResponse.<PageResponse<PostResponse>>builder()
                 .data(postService.findAllByEventId(page, size, eventId)).build();
     }
+
+    @GetMapping("/{id}")
+    public ApiResponse<PostResponse> findById (@PathVariable("id") String id){
+        return ApiResponse.<PostResponse>builder().data(postService.findById(id)).build();
+    }
 }

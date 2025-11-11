@@ -1,25 +1,23 @@
 package com.dongVu1105.post_service.service;
 
-import com.dongVu1105.post_service.dto.request.ReactNoti;
-import com.dongVu1105.post_service.dto.response.CommentResponse;
+import com.dongVu1105.post_service.dto.request.PostNoti;
 import com.dongVu1105.post_service.dto.response.EventResponse;
 import com.dongVu1105.post_service.dto.response.PageResponse;
 import com.dongVu1105.post_service.dto.response.ReactResponse;
-import com.dongVu1105.post_service.entity.Comment;
+import com.dongVu1105.post_service.dto.response.UserProfileResponse;
 import com.dongVu1105.post_service.entity.Post;
 import com.dongVu1105.post_service.entity.React;
 import com.dongVu1105.post_service.exception.AppException;
 import com.dongVu1105.post_service.exception.ErrorCode;
-import com.dongVu1105.post_service.mapper.CommentMapper;
 import com.dongVu1105.post_service.mapper.ReactMapper;
-import com.dongVu1105.post_service.repository.CommentRepository;
 import com.dongVu1105.post_service.repository.PostRepository;
 import com.dongVu1105.post_service.repository.ReactRepository;
 import com.dongVu1105.post_service.repository.httpClient.EventClient;
-import com.dongVu1105.post_service.repository.httpClient.FileClient;
+import com.dongVu1105.post_service.repository.httpClient.UserProfileClient;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,11 +27,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class ReactService {
     PostRepository postRepository;
     DateTimeFormatter dateTimeFormatter;
@@ -41,6 +42,7 @@ public class ReactService {
     ReactMapper reactMapper;
     ReactRepository reactRepository;
     KafkaTemplate<String, Object> kafkaTemplate;
+    UserProfileClient userProfileClient;
 
     public ReactResponse create (String postId){
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -53,12 +55,19 @@ public class ReactService {
                 .postId(postId)
                 .build();
         react = reactRepository.save(react);
-        kafkaTemplate.send("react", ReactNoti.builder()
-                .managerId(managerId)
-                .creator(userId)
-                .ownerId(post.getOwnerId())
-                .eventId(post.getEventId())
+        List<String> receiverId = new ArrayList<>();
+        receiverId.add(post.getOwnerId());
+        receiverId.add(managerId);
+        UserProfileResponse userProfileResponse = userProfileClient.findById(userId).getData();
+        if(Objects.isNull(userProfileResponse)){
+            log.error(ErrorCode.UNCONNECTED_SERVICE.getMessage());
+        }
+        kafkaTemplate.send("react", PostNoti.builder()
                 .postId(post.getId())
+                .creatorName(userProfileResponse.getUsername())
+                .creatorId(userId)
+                .eventId(post.getEventId())
+                .receiverId(receiverId)
                 .build());
         return toReactResponse(react);
     }

@@ -11,9 +11,9 @@ public enum PredefinedNotification {
     ACCEPT_EVENT ("Duyệt sự kiện", "Sự kiện của bạn đã được duyệt. Tên sự kiện: "),
     REJECT_EVENT ("Từ chối sự kiện", "Sự kiện của bạn đã bị từ chối. Tên sự kiện: "),
     NEW_REGISTER ("Đăng ký mới", " đăng ký tham gia sự kiện của bạn"),
-    NEW_POST ("Bài viết mới", " đã thêm bài viết mới từ sự kiện: "),
-    NEW_REACT ("Lượt thích mới", " đã thích bài viết: "),
-    NEW_COMMENT ("Bình luận mới", " đã bình luận bài viết: "),
+    NEW_POST ("Bài viết mới", " đã thêm bài viết mới từ sự kiện của bạn"),
+    NEW_REACT ("Lượt thích mới", " đã thích bài viết của bạn"),
+    NEW_COMMENT ("Bình luận mới", " đã bình luận bài viết của bạn"),
 
 
     ;

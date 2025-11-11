@@ -25,6 +25,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -48,6 +50,10 @@ public class EventUserService {
         if(!event.isStatusEvent()){
             throw new AppException(ErrorCode.UNAVAILABLE_EVENT);
         }
+        if (Instant.now().isAfter(event.getFinishDate())) {
+            throw new AppException(ErrorCode.FINISHED_EVENT);
+        }
+
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         String eventUserHash = this.hashEventUser(userId, request.getEventId());
         EventUser eventUser = eventUserRepository.findByEventUserHash(eventUserHash);
@@ -78,6 +84,10 @@ public class EventUserService {
         if(!event.isStatusEvent()){
             throw new AppException(ErrorCode.UNAVAILABLE_EVENT);
         }
+        if (Instant.now().isAfter(event.getStartDate())) {
+            throw new AppException(ErrorCode.CANNOT_UNSUBSCRIBE_EVENT);
+        }
+
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         String eventUserHash = this.hashEventUser(userId, eventId);
         EventUser eventUser = eventUserRepository.findByEventUserHash(eventUserHash);
@@ -269,6 +279,9 @@ public class EventUserService {
                 .build();
     }
 
+
+
+
     private String hashEventUser (String userId, String eventId){
         List<String> hashList = new ArrayList<>();
         hashList.add(userId);
@@ -278,4 +291,6 @@ public class EventUserService {
         hashList.forEach(stringJoiner::add);
         return stringJoiner.toString();
     }
+
+
 }

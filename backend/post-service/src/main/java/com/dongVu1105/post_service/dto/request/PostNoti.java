@@ -3,6 +3,8 @@ package com.dongVu1105.post_service.dto.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -10,7 +12,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PostNoti {
     String postId;
-    String managerId;
-    String ownerId;
+    List<String> receiverId;
+    String creatorName;
+    String creatorId;
     String eventId;
 }

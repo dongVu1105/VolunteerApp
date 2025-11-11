@@ -3,9 +3,7 @@ package com.dongVu1105.notification_service.controller;
 
 
 import com.dongVu1105.notification_service.constant.PredefinedNotification;
-import com.dongVu1105.notification_service.dto.request.EventNoti;
-import com.dongVu1105.notification_service.dto.request.EventResponse;
-import com.dongVu1105.notification_service.dto.request.EventUserNoti;
+import com.dongVu1105.notification_service.dto.request.*;
 import com.dongVu1105.notification_service.service.NotificationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +51,21 @@ public class ListenNotificationController {
     @KafkaListener(topics = "confirm-completion")
     public void listenConfirmCompletionNotification(EventNoti eventNoti){
         notificationService.sendUser(eventNoti, PredefinedNotification.CONFIRM_COMPLETION);
+    }
+
+    @KafkaListener(topics = "post")
+    public void listenPostNotification (PostNoti postNoti){
+        notificationService.postNotification(postNoti, PredefinedNotification.NEW_POST);
+    }
+
+    @KafkaListener(topics = "comment")
+    public void listenCommentNotification (PostNoti postNoti){
+        notificationService.postNotification(postNoti, PredefinedNotification.NEW_COMMENT);
+    }
+
+    @KafkaListener(topics = "react")
+    public void listenReactNotification (PostNoti postNoti){
+        notificationService.postNotification(postNoti, PredefinedNotification.NEW_REACT);
     }
 
 }

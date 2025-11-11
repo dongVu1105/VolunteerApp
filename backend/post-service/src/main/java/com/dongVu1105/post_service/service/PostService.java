@@ -5,6 +5,7 @@ import com.dongVu1105.post_service.dto.request.PostRequest;
 import com.dongVu1105.post_service.dto.response.EventResponse;
 import com.dongVu1105.post_service.dto.response.PageResponse;
 import com.dongVu1105.post_service.dto.response.PostResponse;
+import com.dongVu1105.post_service.dto.response.UserProfileResponse;
 import com.dongVu1105.post_service.entity.Post;
 import com.dongVu1105.post_service.exception.AppException;
 import com.dongVu1105.post_service.exception.ErrorCode;
@@ -12,6 +13,7 @@ import com.dongVu1105.post_service.mapper.PostMapper;
 import com.dongVu1105.post_service.repository.PostRepository;
 import com.dongVu1105.post_service.repository.httpClient.EventClient;
 import com.dongVu1105.post_service.repository.httpClient.FileClient;
+import com.dongVu1105.post_service.repository.httpClient.UserProfileClient;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,6 +43,7 @@ public class PostService {
     EventClient eventClient;
     FileClient fileClient;
     KafkaTemplate<String, Object> kafkaTemplate;
+    UserProfileClient userProfileClient;
 
     public PostResponse create (MultipartFile file, PostRequest request){
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -50,13 +54,26 @@ public class PostService {
         post.setCreatedDate(Instant.now());
         post.setOwnerId(userId);
         post = postRepository.save(post);
+        List<String> receiverId = new ArrayList<>();
+        receiverId.add(managerId);
+        UserProfileResponse userProfileResponse = userProfileClient.findById(userId).getData();
+        if(Objects.isNull(userProfileResponse)){
+            log.error(ErrorCode.UNCONNECTED_SERVICE.getMessage());
+        }
         kafkaTemplate.send("post", PostNoti.builder()
                 .postId(post.getId())
-                .ownerId(userId)
+                .creatorName(userProfileResponse.getUsername())
+                .creatorId(userId)
                 .eventId(post.getEventId())
-                .managerId(managerId)
+                .receiverId(receiverId)
                 .build());
         return this.toPostResponse(post);
+    }
+
+    public PostResponse findById (String id){
+        Post post = postRepository.findById(id).orElseThrow(
+                () -> new AppException(ErrorCode.POST_NOT_EXISTED));
+        return toPostResponse(post);
     }
 
     public void delete (String postId){

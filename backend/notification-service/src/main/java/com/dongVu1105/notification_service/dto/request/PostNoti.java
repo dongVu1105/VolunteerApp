@@ -1,17 +1,19 @@
-package com.dongVu1105.post_service.dto.request;
+package com.dongVu1105.notification_service.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ReactNoti {
+public class PostNoti {
     String postId;
-    String managerId;
-    String ownerId;
+    List<String> receiverId;
+    String creatorName;
+    String creatorId;
     String eventId;
-    String creator;
 }
