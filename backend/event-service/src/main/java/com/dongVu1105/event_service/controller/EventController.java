@@ -15,6 +15,8 @@ import org.apache.kafka.shaded.com.google.protobuf.Api;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
+
 @RestController
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -40,15 +42,16 @@ public class EventController {
         return ApiResponse.<EventResponse>builder().data(eventService.update(request, file)).build();
     }
 
-    // Người dùng lọc event theo danh mục
-    @GetMapping("/category")
-    public ApiResponse<PageResponse<EventResponse>> findAllByCategory (
+    // Người dùng lọc event theo danh mục và ngày
+    @GetMapping("/category-date")
+    public ApiResponse<PageResponse<EventResponse>> findAllByCategoryAndDate (
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size,
-            @RequestParam(value = "category", required = false, defaultValue = "Từ thiện") String category){
-        System.out.println(category);
+            @RequestParam(value = "category", required = false, defaultValue = "Từ thiện") String category,
+            @RequestParam(value = "fromDate", required = false, defaultValue = "2000-01-01T08:00:00Z") Instant fromDate,
+            @RequestParam(value = "toDate", required = false, defaultValue = "2100-01-01T08:00:00Z") Instant toDate){
         return ApiResponse.<PageResponse<EventResponse>>builder()
-                .data(eventService.findAllByCategory(page, size, category)).build();
+                .data(eventService.findAllByCategoryAndDate(page, size, category, fromDate, toDate)).build();
     }
 
     // Tìm event theo id

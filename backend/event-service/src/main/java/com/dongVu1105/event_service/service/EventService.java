@@ -118,10 +118,11 @@ public class EventService {
         return event.isStatusEvent();
     }
     /// Cần thêm lọc theo thời gian
-    public PageResponse<EventResponse> findAllByCategory (int page, int size, String category){
+    public PageResponse<EventResponse> findAllByCategoryAndDate (int page, int size, String category, Instant fromDate, Instant toDate){
         Sort sort = Sort.by("createdDate").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
-        Page<Event> eventPage = eventRepository.findAllByStatusEventAndCategory(true,category, pageable);
+        Page<Event> eventPage = eventRepository.findAllByStatusEventAndCategoryAndStartDateGreaterThanEqualAndFinishDateLessThanEqual
+                (true,category,fromDate, toDate, pageable);
         var eventData = eventPage.getContent().stream().map(this::toEventResponse).toList();
 
         return PageResponse.<EventResponse>builder()
@@ -148,6 +149,7 @@ public class EventService {
                 .result(eventData)
                 .build();
     }
+
 
     private EventResponse toEventResponse (Event event){
         EventResponse eventResponse = eventMapper.toEventResponse(event);

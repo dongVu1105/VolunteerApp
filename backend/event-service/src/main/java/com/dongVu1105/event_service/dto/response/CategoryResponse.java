@@ -1,4 +1,4 @@
-package com.dongVu1105.event_service.entity;
+package com.dongVu1105.event_service.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -7,12 +7,9 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 
 @Data
 @Builder
-@Document("category")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
-public class Category {
-    @MongoId
-    String id;
+public class CategoryResponse {
     String name;
 }

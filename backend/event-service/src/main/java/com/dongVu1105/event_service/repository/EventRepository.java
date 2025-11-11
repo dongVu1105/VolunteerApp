@@ -6,8 +6,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
+
 @Repository
 public interface EventRepository extends MongoRepository<Event, String> {
-    Page<Event> findAllByStatusEventAndCategory (boolean statusEvent, String category, Pageable pageable);
+    Page<Event> findAllByStatusEventAndCategoryAndStartDateGreaterThanEqualAndFinishDateLessThanEqual
+            (boolean statusEvent,
+             String category,
+             Instant startDateFrom,
+             Instant finishDateTo,
+             Pageable pageable);
     Page<Event> findAllByStatusEvent (boolean statusEvent, Pageable pageable);
 }
