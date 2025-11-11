@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
+import java.util.List;
 
 @Repository
 public interface EventRepository extends MongoRepository<Event, String> {
@@ -17,4 +18,5 @@ public interface EventRepository extends MongoRepository<Event, String> {
              Instant finishDateTo,
              Pageable pageable);
     Page<Event> findAllByStatusEvent (boolean statusEvent, Pageable pageable);
+    Page<Event> findAllByIdIn (List<String> eventIdList, Pageable pageable);
 }

@@ -117,7 +117,7 @@ public class EventService {
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
         return event.isStatusEvent();
     }
-    /// Cần thêm lọc theo thời gian
+
     public PageResponse<EventResponse> findAllByCategoryAndDate (int page, int size, String category, Instant fromDate, Instant toDate){
         Sort sort = Sort.by("createdDate").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);

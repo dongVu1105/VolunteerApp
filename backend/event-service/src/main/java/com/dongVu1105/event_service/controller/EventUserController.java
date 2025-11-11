@@ -2,8 +2,10 @@ package com.dongVu1105.event_service.controller;
 
 import com.dongVu1105.event_service.dto.ApiResponse;
 import com.dongVu1105.event_service.dto.request.EventUserCreationRequest;
+import com.dongVu1105.event_service.dto.response.EventResponse;
 import com.dongVu1105.event_service.dto.response.EventUserResponse;
 import com.dongVu1105.event_service.dto.response.PageResponse;
+import com.dongVu1105.event_service.dto.response.UserProfileResponse;
 import com.dongVu1105.event_service.service.EventUserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -34,20 +36,20 @@ public class EventUserController {
 
     // Người dùng xem các sự kiện được đánh dấu đã hoàn thành
     @GetMapping("/completed-event")
-    public ApiResponse<PageResponse<EventUserResponse>> findAllMyCompletedEvent (
+    public ApiResponse<PageResponse<EventResponse>> findAllMyCompletedEvent (
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size){
-        return ApiResponse.<PageResponse<EventUserResponse>>builder()
+        return ApiResponse.<PageResponse<EventResponse>>builder()
                 .data(eventUserService.findAllMyCompletedEventByUserId(page, size)).build();
     }
 
     // Quản lí sự kiện xem các user chưa được xác nhận tham gia
     @GetMapping("/pending")
-    public ApiResponse<PageResponse<EventUserResponse>> findAllPendingUser (
+    public ApiResponse<PageResponse<UserProfileResponse>> findAllPendingUser (
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size,
             @RequestParam(value = "eventId") String eventId){
-        return ApiResponse.<PageResponse<EventUserResponse>>builder()
+        return ApiResponse.<PageResponse<UserProfileResponse>>builder()
                 .data(eventUserService.findAllPendingUser(page, size, eventId)).build();
     }
 
@@ -82,21 +84,21 @@ public class EventUserController {
 
     // Quản lí sự kiện xem các user đang tham gia event
     @GetMapping("/attending")
-    public ApiResponse<PageResponse<EventUserResponse>> findAllAttendingUser (
+    public ApiResponse<PageResponse<UserProfileResponse>> findAllAttendingUser (
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size,
             @RequestParam(value = "eventId") String eventId){
-        return ApiResponse.<PageResponse<EventUserResponse>>builder()
+        return ApiResponse.<PageResponse<UserProfileResponse>>builder()
                 .data(eventUserService.findAllAttendingUser(page, size, eventId)).build();
     }
 
     // Quản lí sự kiện xem danh sách user trong event
     @GetMapping("/find-all")
-    public ApiResponse<PageResponse<EventUserResponse>> findAllUserInEvent (
+    public ApiResponse<PageResponse<UserProfileResponse>> findAllUserInEvent (
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "10") int size,
             @RequestParam(value = "eventId") String eventId){
-        return ApiResponse.<PageResponse<EventUserResponse>>builder()
+        return ApiResponse.<PageResponse<UserProfileResponse>>builder()
                 .data(eventUserService.findAllUserInEvent(page, size, eventId)).build();
     }
 
