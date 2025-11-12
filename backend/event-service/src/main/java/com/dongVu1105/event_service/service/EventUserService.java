@@ -3,12 +3,14 @@ package com.dongVu1105.event_service.service;
 import com.dongVu1105.event_service.dto.request.EventNoti;
 import com.dongVu1105.event_service.dto.request.EventUserCreationRequest;
 import com.dongVu1105.event_service.dto.request.EventUserNoti;
+import com.dongVu1105.event_service.dto.request.GetProfileRequest;
 import com.dongVu1105.event_service.dto.response.*;
 import com.dongVu1105.event_service.entity.Event;
 import com.dongVu1105.event_service.entity.EventUser;
 import com.dongVu1105.event_service.enums.EventUserStatus;
 import com.dongVu1105.event_service.exception.AppException;
 import com.dongVu1105.event_service.exception.ErrorCode;
+import com.dongVu1105.event_service.mapper.EventMapper;
 import com.dongVu1105.event_service.mapper.EventUserMapper;
 import com.dongVu1105.event_service.repository.EventRepository;
 import com.dongVu1105.event_service.repository.EventUserRepository;
@@ -20,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,6 +46,7 @@ public class EventUserService {
     EventRepository eventRepository;
     KafkaTemplate<String, Object> kafkaTemplate;
     UserProfileClient userProfileClient;
+    EventMapper eventMapper;
 
     public EventUserResponse eventRegistration (EventUserCreationRequest request){
         Event event = eventRepository.findById(request.getEventId())
@@ -98,24 +102,28 @@ public class EventUserService {
     }
 
     /// Cần hiện danh sách thông tin event
-    public PageResponse<EventUserResponse> findAllMyCompletedEventByUserId (int page, int size){
-        Pageable pageable = PageRequest.of(page - 1, size);
+    public PageResponse<EventResponse> findAllMyCompletedEventByUserId (int page, int size){
+        Sort sort = Sort.by("id");
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-        Page<EventUser> eventUserPage = eventUserRepository.findAllByStatusAndUserId(EventUserStatus.COMPLETED.name(), userId, pageable);
-        var eventUserData = eventUserPage.getContent().stream().map(eventUserMapper::toEventUserResponse).toList();
-
-        return PageResponse.<EventUserResponse>builder()
+        Page<EventUser> eventUserPage = eventUserRepository
+                .findAllByStatusAndUserId(EventUserStatus.COMPLETED.name(), userId, pageable);
+        List<String> eventIdList = new ArrayList<>();
+        eventUserPage.getContent().forEach(eventUser -> eventIdList.add(eventUser.getEventId()));
+        List<EventResponse> eventResponseList = eventRepository.findAllByIdIn(eventIdList)
+                .stream().map(eventMapper::toEventResponse).toList();
+        return PageResponse.<EventResponse>builder()
                 .currentPage(page)
                 .pageSize(eventUserPage.getSize())
                 .totalPages(eventUserPage.getTotalPages())
                 .totalElements(eventUserPage.getTotalElements())
-                .result(eventUserData)
+                .result(eventResponseList)
                 .build();
     }
 
     /// Cần hiện thông tin user
     @PreAuthorize("hasRole('EVENT_MANAGER')")
-    public PageResponse<EventUserResponse> findAllPendingUser (int page, int size, String eventId){
+    public PageResponse<UserProfileResponse> findAllPendingUser (int page, int size, String eventId){
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
         if(!event.isStatusEvent()){
@@ -125,16 +133,21 @@ public class EventUserService {
         if (!event.getManagerId().equals(managerId)){
             throw new AppException(ErrorCode.CANNOT_MODIFY_EVENT);
         }
-        Pageable pageable = PageRequest.of(page - 1, size);
-        Page<EventUser> eventUserPage = eventUserRepository.findAllByStatusAndEventId(EventUserStatus.PENDING.name(), eventId, pageable);
-        var eventUserData = eventUserPage.getContent().stream().map(eventUserMapper::toEventUserResponse).toList();
-
-        return PageResponse.<EventUserResponse>builder()
+        Sort sort = Sort.by("id");
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        Page<EventUser> eventUserPage = eventUserRepository
+                .findAllByStatusAndEventId(EventUserStatus.PENDING.name(), eventId, pageable);
+        List<String> userIdList = new ArrayList<>();
+        eventUserPage.getContent().forEach(eventUser -> userIdList.add(eventUser.getUserId()));
+        GetProfileRequest getProfileRequest = GetProfileRequest.builder()
+                .userIdList(userIdList).build();
+        List<UserProfileResponse> userProfilePage = userProfileClient.findAllByUserIdList(getProfileRequest).getData();
+        return PageResponse.<UserProfileResponse>builder()
                 .currentPage(page)
                 .pageSize(eventUserPage.getSize())
                 .totalPages(eventUserPage.getTotalPages())
                 .totalElements(eventUserPage.getTotalElements())
-                .result(eventUserData)
+                .result(userProfilePage)
                 .build();
     }
 
@@ -206,7 +219,7 @@ public class EventUserService {
 
     /// Cần hiện thông tin user
     @PreAuthorize("hasRole('EVENT_MANAGER')")
-    public PageResponse<EventUserResponse> findAllAttendingUser (int page, int size, String eventId){
+    public PageResponse<UserProfileResponse> findAllAttendingUser (int page, int size, String eventId){
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
         if(!event.isStatusEvent()){
@@ -216,16 +229,21 @@ public class EventUserService {
         if (!event.getManagerId().equals(managerId)){
             throw new AppException(ErrorCode.CANNOT_MODIFY_EVENT);
         }
-        Pageable pageable = PageRequest.of(page - 1, size);
-        Page<EventUser> eventUserPage = eventUserRepository.findAllByStatusAndEventId(EventUserStatus.ATTENDING.name(), eventId, pageable);
-        var eventUserData = eventUserPage.getContent().stream().map(eventUserMapper::toEventUserResponse).toList();
-
-        return PageResponse.<EventUserResponse>builder()
+        Sort sort = Sort.by("id");
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        Page<EventUser> eventUserPage = eventUserRepository
+                .findAllByStatusAndEventId(EventUserStatus.ATTENDING.name(), eventId, pageable);
+        List<String> userIdList = new ArrayList<>();
+        eventUserPage.getContent().forEach(eventUser -> userIdList.add(eventUser.getUserId()));
+        GetProfileRequest getProfileRequest = GetProfileRequest.builder()
+                .userIdList(userIdList).build();
+        List<UserProfileResponse> userProfilePage = userProfileClient.findAllByUserIdList(getProfileRequest).getData();
+        return PageResponse.<UserProfileResponse>builder()
                 .currentPage(page)
                 .pageSize(eventUserPage.getSize())
                 .totalPages(eventUserPage.getTotalPages())
                 .totalElements(eventUserPage.getTotalElements())
-                .result(eventUserData)
+                .result(userProfilePage)
                 .build();
     }
 
@@ -256,7 +274,7 @@ public class EventUserService {
     /// Cần hiện thông tin user
     /// Liệu user xem được không?
     @PreAuthorize("hasRole('EVENT_MANAGER')")
-    public PageResponse<EventUserResponse> findAllUserInEvent (int page, int size, String eventId){
+    public PageResponse<UserProfileResponse> findAllUserInEvent (int page, int size, String eventId){
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
         if(!event.isStatusEvent()){
@@ -266,16 +284,20 @@ public class EventUserService {
         if (!event.getManagerId().equals(managerId)){
             throw new AppException(ErrorCode.CANNOT_MODIFY_EVENT);
         }
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Sort sort = Sort.by("id");
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         Page<EventUser> eventUserPage = eventUserRepository.findAllByEventId(eventId, pageable);
-        var eventUserData = eventUserPage.getContent().stream().map(eventUserMapper::toEventUserResponse).toList();
-
-        return PageResponse.<EventUserResponse>builder()
+        List<String> userIdList = new ArrayList<>();
+        eventUserPage.getContent().forEach(eventUser -> userIdList.add(eventUser.getUserId()));
+        GetProfileRequest getProfileRequest = GetProfileRequest.builder()
+                .userIdList(userIdList).build();
+        List<UserProfileResponse> userProfilePage = userProfileClient.findAllByUserIdList(getProfileRequest).getData();
+        return PageResponse.<UserProfileResponse>builder()
                 .currentPage(page)
                 .pageSize(eventUserPage.getSize())
                 .totalPages(eventUserPage.getTotalPages())
                 .totalElements(eventUserPage.getTotalElements())
-                .result(eventUserData)
+                .result(userProfilePage)
                 .build();
     }
 
