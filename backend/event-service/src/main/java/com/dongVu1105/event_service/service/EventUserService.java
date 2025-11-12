@@ -103,21 +103,21 @@ public class EventUserService {
 
     /// Cần hiện danh sách thông tin event
     public PageResponse<EventResponse> findAllMyCompletedEventByUserId (int page, int size){
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Sort sort = Sort.by("id");
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-        Page<EventUser> eventUserPage = eventUserRepository.findAllByStatusAndUserId(EventUserStatus.COMPLETED.name(), userId, pageable);
+        Page<EventUser> eventUserPage = eventUserRepository
+                .findAllByStatusAndUserId(EventUserStatus.COMPLETED.name(), userId, pageable);
         List<String> eventIdList = new ArrayList<>();
         eventUserPage.getContent().forEach(eventUser -> eventIdList.add(eventUser.getEventId()));
-        Sort sort = Sort.by("createdDate").descending();
-        Pageable pageable1 = PageRequest.of(page-1, size, sort);
-        Page<Event> eventPage = eventRepository.findAllByIdIn(eventIdList, pageable1);
-        var eventData = eventPage.getContent().stream().map(eventMapper::toEventResponse).toList();
+        List<EventResponse> eventResponseList = eventRepository.findAllByIdIn(eventIdList)
+                .stream().map(eventMapper::toEventResponse).toList();
         return PageResponse.<EventResponse>builder()
                 .currentPage(page)
-                .pageSize(eventPage.getSize())
-                .totalPages(eventPage.getTotalPages())
-                .totalElements(eventPage.getTotalElements())
-                .result(eventData)
+                .pageSize(eventUserPage.getSize())
+                .totalPages(eventUserPage.getTotalPages())
+                .totalElements(eventUserPage.getTotalElements())
+                .result(eventResponseList)
                 .build();
     }
 
@@ -133,22 +133,21 @@ public class EventUserService {
         if (!event.getManagerId().equals(managerId)){
             throw new AppException(ErrorCode.CANNOT_MODIFY_EVENT);
         }
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Sort sort = Sort.by("id");
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         Page<EventUser> eventUserPage = eventUserRepository
                 .findAllByStatusAndEventId(EventUserStatus.PENDING.name(), eventId, pageable);
         List<String> userIdList = new ArrayList<>();
         eventUserPage.getContent().forEach(eventUser -> userIdList.add(eventUser.getUserId()));
         GetProfileRequest getProfileRequest = GetProfileRequest.builder()
-                .userIdList(userIdList)
-                .page(page)
-                .size(size).build();
-        PageResponse<UserProfileResponse> userProfilePage = userProfileClient.findAllByUserIdList(getProfileRequest).getData();
+                .userIdList(userIdList).build();
+        List<UserProfileResponse> userProfilePage = userProfileClient.findAllByUserIdList(getProfileRequest).getData();
         return PageResponse.<UserProfileResponse>builder()
-                .currentPage(userProfilePage.getCurrentPage())
-                .pageSize(userProfilePage.getPageSize())
-                .totalPages(userProfilePage.getTotalPages())
-                .totalElements(userProfilePage.getTotalElements())
-                .result(userProfilePage.getResult())
+                .currentPage(page)
+                .pageSize(eventUserPage.getSize())
+                .totalPages(eventUserPage.getTotalPages())
+                .totalElements(eventUserPage.getTotalElements())
+                .result(userProfilePage)
                 .build();
     }
 
@@ -230,21 +229,21 @@ public class EventUserService {
         if (!event.getManagerId().equals(managerId)){
             throw new AppException(ErrorCode.CANNOT_MODIFY_EVENT);
         }
-        Pageable pageable = PageRequest.of(page - 1, size);
-        Page<EventUser> eventUserPage = eventUserRepository.findAllByStatusAndEventId(EventUserStatus.ATTENDING.name(), eventId, pageable);
+        Sort sort = Sort.by("id");
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        Page<EventUser> eventUserPage = eventUserRepository
+                .findAllByStatusAndEventId(EventUserStatus.ATTENDING.name(), eventId, pageable);
         List<String> userIdList = new ArrayList<>();
         eventUserPage.getContent().forEach(eventUser -> userIdList.add(eventUser.getUserId()));
         GetProfileRequest getProfileRequest = GetProfileRequest.builder()
-                .userIdList(userIdList)
-                .page(page)
-                .size(size).build();
-        PageResponse<UserProfileResponse> userProfilePage = userProfileClient.findAllByUserIdList(getProfileRequest).getData();
+                .userIdList(userIdList).build();
+        List<UserProfileResponse> userProfilePage = userProfileClient.findAllByUserIdList(getProfileRequest).getData();
         return PageResponse.<UserProfileResponse>builder()
-                .currentPage(userProfilePage.getCurrentPage())
-                .pageSize(userProfilePage.getPageSize())
-                .totalPages(userProfilePage.getTotalPages())
-                .totalElements(userProfilePage.getTotalElements())
-                .result(userProfilePage.getResult())
+                .currentPage(page)
+                .pageSize(eventUserPage.getSize())
+                .totalPages(eventUserPage.getTotalPages())
+                .totalElements(eventUserPage.getTotalElements())
+                .result(userProfilePage)
                 .build();
     }
 
@@ -285,21 +284,20 @@ public class EventUserService {
         if (!event.getManagerId().equals(managerId)){
             throw new AppException(ErrorCode.CANNOT_MODIFY_EVENT);
         }
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Sort sort = Sort.by("id");
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
         Page<EventUser> eventUserPage = eventUserRepository.findAllByEventId(eventId, pageable);
         List<String> userIdList = new ArrayList<>();
         eventUserPage.getContent().forEach(eventUser -> userIdList.add(eventUser.getUserId()));
         GetProfileRequest getProfileRequest = GetProfileRequest.builder()
-                .userIdList(userIdList)
-                .page(page)
-                .size(size).build();
-        PageResponse<UserProfileResponse> userProfilePage = userProfileClient.findAllByUserIdList(getProfileRequest).getData();
+                .userIdList(userIdList).build();
+        List<UserProfileResponse> userProfilePage = userProfileClient.findAllByUserIdList(getProfileRequest).getData();
         return PageResponse.<UserProfileResponse>builder()
-                .currentPage(userProfilePage.getCurrentPage())
-                .pageSize(userProfilePage.getPageSize())
-                .totalPages(userProfilePage.getTotalPages())
-                .totalElements(userProfilePage.getTotalElements())
-                .result(userProfilePage.getResult())
+                .currentPage(page)
+                .pageSize(eventUserPage.getSize())
+                .totalPages(eventUserPage.getTotalPages())
+                .totalElements(eventUserPage.getTotalElements())
+                .result(userProfilePage)
                 .build();
     }
 

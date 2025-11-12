@@ -12,6 +12,4 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class GetProfileRequest {
     List<String> userIdList;
-    int page;
-    int size;
 }

@@ -18,5 +18,5 @@ public interface EventRepository extends MongoRepository<Event, String> {
              Instant finishDateTo,
              Pageable pageable);
     Page<Event> findAllByStatusEvent (boolean statusEvent, Pageable pageable);
-    Page<Event> findAllByIdIn (List<String> eventIdList, Pageable pageable);
+    List<Event> findAllByIdIn (List<String> eventIdList);
 }

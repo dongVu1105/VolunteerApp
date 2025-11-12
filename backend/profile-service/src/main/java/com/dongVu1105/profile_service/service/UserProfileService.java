@@ -42,16 +42,8 @@ public class UserProfileService {
         return userProfileMapper.toUserProfileResponse(userProfileRepository.findByUserId(userId));
     }
 
-    public PageResponse<UserProfileResponse> findAllByUserIdList (GetProfileRequest request){
-        Sort sort = Sort.by("username");
-        Pageable pageable = PageRequest.of(request.getPage()- 1, request.getSize(), sort);
-        Page<UserProfile> userProfilePage = userProfileRepository.findAllByUserIdIn(request.getUserIdList(), pageable);
-        var userProfileData = userProfilePage.getContent().stream().map(userProfileMapper::toUserProfileResponse).toList();
-        return PageResponse.<UserProfileResponse>builder()
-                .currentPage(request.getPage())
-                .pageSize(userProfilePage.getSize())
-                .totalElements(userProfilePage.getTotalElements())
-                .totalPages(userProfilePage.getTotalPages())
-                .result(userProfileData).build();
+    public List<UserProfileResponse> findAllByUserIdList (GetProfileRequest request){
+        return userProfileRepository.findAllByUserIdIn(request.getUserIdList())
+                .stream().map(userProfileMapper::toUserProfileResponse).toList();
     }
 }

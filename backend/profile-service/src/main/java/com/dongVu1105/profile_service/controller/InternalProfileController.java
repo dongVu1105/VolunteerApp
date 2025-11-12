@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/internal")
 @RequiredArgsConstructor
@@ -29,9 +31,9 @@ public class InternalProfileController {
         return ApiResponse.<UserProfileResponse>builder().data(userProfileService.findByUserId(userId)).build();
     }
 
-    @GetMapping("/userId-list")
-    public ApiResponse<PageResponse<UserProfileResponse>> findAllByUserIdList (@RequestBody GetProfileRequest request){
-        return ApiResponse.<PageResponse<UserProfileResponse>>builder()
+    @PostMapping("/userId-list")
+    public ApiResponse<List<UserProfileResponse>> findAllByUserIdList (@RequestBody GetProfileRequest request){
+        return ApiResponse.<List<UserProfileResponse>>builder()
                 .data(userProfileService.findAllByUserIdList(request)).build();
     }
 }
