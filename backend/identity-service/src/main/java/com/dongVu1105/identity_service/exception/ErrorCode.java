@@ -13,7 +13,8 @@ public enum ErrorCode {
     USER_EXISTED (1005, "user existed", HttpStatus.BAD_REQUEST),
     UNABLE_ACCOUNT (1006, "account was unable!", HttpStatus.BAD_REQUEST),
     CAN_NOT_CREATE_TOKEN (1007, "cannot create token", HttpStatus.BAD_REQUEST),
-    ROLE_NOT_EXISTED (1008, "role not existed", HttpStatus.NOT_FOUND)
+    ROLE_NOT_EXISTED (1008, "role not existed", HttpStatus.NOT_FOUND),
+    FAIL_REGISTRATION (1009, "register fail!", HttpStatus.NOT_FOUND)
     ;
 
     private final int code;

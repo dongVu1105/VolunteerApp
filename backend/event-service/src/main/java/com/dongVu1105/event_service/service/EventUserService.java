@@ -123,7 +123,7 @@ public class EventUserService {
 
     /// Cần hiện thông tin user
     @PreAuthorize("hasRole('EVENT_MANAGER')")
-    public PageResponse<UserProfileResponse> findAllPendingUser (int page, int size, String eventId){
+    public PageResponse<EventUserInfoResponse> findAllPendingUser (int page, int size, String eventId){
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
         if(!event.isStatusEvent()){
@@ -142,12 +142,20 @@ public class EventUserService {
         GetProfileRequest getProfileRequest = GetProfileRequest.builder()
                 .userIdList(userIdList).build();
         List<UserProfileResponse> userProfilePage = userProfileClient.findAllByUserIdList(getProfileRequest).getData();
-        return PageResponse.<UserProfileResponse>builder()
+        List<EventUserInfoResponse> eventUserInfoResponseList = eventUserPage.getContent().stream().map(eventUser -> {
+            UserProfileResponse userProfileResponse = userProfilePage.stream().filter(
+                    userProfileResponse1 -> userProfileResponse1.getUserId().equals(eventUser.getUserId())).findFirst().orElseThrow();
+            EventUserInfoResponse eventUserInfoResponse = eventUserMapper.toEventUserInfoResponse(userProfileResponse);
+            eventUserInfoResponse.setId(eventUser.getId());
+            eventUserInfoResponse.setStatus(eventUser.getStatus());
+            return eventUserInfoResponse;
+        }).toList();
+        return PageResponse.<EventUserInfoResponse>builder()
                 .currentPage(page)
                 .pageSize(eventUserPage.getSize())
                 .totalPages(eventUserPage.getTotalPages())
                 .totalElements(eventUserPage.getTotalElements())
-                .result(userProfilePage)
+                .result(eventUserInfoResponseList)
                 .build();
     }
 
@@ -219,7 +227,7 @@ public class EventUserService {
 
     /// Cần hiện thông tin user
     @PreAuthorize("hasRole('EVENT_MANAGER')")
-    public PageResponse<UserProfileResponse> findAllAttendingUser (int page, int size, String eventId){
+    public PageResponse<EventUserInfoResponse> findAllAttendingUser (int page, int size, String eventId){
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
         if(!event.isStatusEvent()){
@@ -238,12 +246,20 @@ public class EventUserService {
         GetProfileRequest getProfileRequest = GetProfileRequest.builder()
                 .userIdList(userIdList).build();
         List<UserProfileResponse> userProfilePage = userProfileClient.findAllByUserIdList(getProfileRequest).getData();
-        return PageResponse.<UserProfileResponse>builder()
+        List<EventUserInfoResponse> eventUserInfoResponseList = eventUserPage.getContent().stream().map(eventUser -> {
+            UserProfileResponse userProfileResponse = userProfilePage.stream().filter(
+                    userProfileResponse1 -> userProfileResponse1.getUserId().equals(eventUser.getUserId())).findFirst().orElseThrow(null);
+            EventUserInfoResponse eventUserInfoResponse = eventUserMapper.toEventUserInfoResponse(userProfileResponse);
+            eventUserInfoResponse.setId(eventUser.getId());
+            eventUserInfoResponse.setStatus(eventUser.getStatus());
+            return eventUserInfoResponse;
+        }).toList();
+        return PageResponse.<EventUserInfoResponse>builder()
                 .currentPage(page)
                 .pageSize(eventUserPage.getSize())
                 .totalPages(eventUserPage.getTotalPages())
                 .totalElements(eventUserPage.getTotalElements())
-                .result(userProfilePage)
+                .result(eventUserInfoResponseList)
                 .build();
     }
 
@@ -274,7 +290,7 @@ public class EventUserService {
     /// Cần hiện thông tin user
     /// Liệu user xem được không?
     @PreAuthorize("hasRole('EVENT_MANAGER')")
-    public PageResponse<UserProfileResponse> findAllUserInEvent (int page, int size, String eventId){
+    public PageResponse<EventUserInfoResponse> findAllUserInEvent (int page, int size, String eventId){
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
         if(!event.isStatusEvent()){
@@ -292,12 +308,20 @@ public class EventUserService {
         GetProfileRequest getProfileRequest = GetProfileRequest.builder()
                 .userIdList(userIdList).build();
         List<UserProfileResponse> userProfilePage = userProfileClient.findAllByUserIdList(getProfileRequest).getData();
-        return PageResponse.<UserProfileResponse>builder()
+        List<EventUserInfoResponse> eventUserInfoResponseList = eventUserPage.getContent().stream().map(eventUser -> {
+            UserProfileResponse userProfileResponse = userProfilePage.stream().filter(
+                    userProfileResponse1 -> userProfileResponse1.getUserId().equals(eventUser.getUserId())).findFirst().orElseThrow(null);
+            EventUserInfoResponse eventUserInfoResponse = eventUserMapper.toEventUserInfoResponse(userProfileResponse);
+            eventUserInfoResponse.setId(eventUser.getId());
+            eventUserInfoResponse.setStatus(eventUser.getStatus());
+            return eventUserInfoResponse;
+        }).toList();
+        return PageResponse.<EventUserInfoResponse>builder()
                 .currentPage(page)
                 .pageSize(eventUserPage.getSize())
                 .totalPages(eventUserPage.getTotalPages())
                 .totalElements(eventUserPage.getTotalElements())
-                .result(userProfilePage)
+                .result(eventUserInfoResponseList)
                 .build();
     }
 
