@@ -14,5 +14,7 @@ public class ReactResponse {
     String id;
     String postId;
     String ownerId;
+    String ownerAvatar;
+    String ownerUsername;
     String createdDate;
 }

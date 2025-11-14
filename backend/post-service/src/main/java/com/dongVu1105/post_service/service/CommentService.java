@@ -73,7 +73,7 @@ public class CommentService {
                 .eventId(post.getEventId())
                 .receiverId(receiverId)
                 .build());
-        return toCommentResponse(comment);
+        return toCommentResponse(comment, userProfileResponse);
     }
 
     public void delete (String commentId){
@@ -111,7 +111,13 @@ public class CommentService {
         Sort sort = Sort.by("createdDate").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         Page<Comment> commentPage = commentRepository.findAllByPostId(postId, pageable);
-        var commentData = commentPage.getContent().stream().map(this::toCommentResponse).toList();
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserProfileResponse userProfileResponse = userProfileClient.findById(userId).getData();
+        if(Objects.isNull(userProfileResponse)){
+            log.error(ErrorCode.UNCONNECTED_SERVICE.getMessage());
+        }
+        var commentData = commentPage.getContent().stream()
+                .map(comment -> this.toCommentResponse(comment, userProfileResponse)).toList();
         return PageResponse.<CommentResponse>builder()
                 .currentPage(page)
                 .pageSize(size)
@@ -120,9 +126,11 @@ public class CommentService {
                 .result(commentData).build();
     }
 
-    private CommentResponse toCommentResponse (Comment comment){
+    private CommentResponse toCommentResponse (Comment comment, UserProfileResponse userProfileResponse){
         CommentResponse commentResponse = commentMapper.toCommentResponse(comment);
         commentResponse.setCreatedDate(dateTimeFormatter.format(comment.getCreatedDate()));
+        commentResponse.setOwnerUsername(userProfileResponse.getUsername());
+        commentResponse.setOwnerAvatar(userProfileResponse.getAvatar());
         return commentResponse;
     }
 }

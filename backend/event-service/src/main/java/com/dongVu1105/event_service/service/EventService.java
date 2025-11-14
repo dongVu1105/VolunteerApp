@@ -16,6 +16,7 @@ import com.dongVu1105.event_service.repository.EventRepository;
 import com.dongVu1105.event_service.repository.EventUserRepository;
 import com.dongVu1105.event_service.repository.httpclient.FileClient;
 import com.dongVu1105.event_service.repository.httpclient.IdentityClient;
+import com.dongVu1105.event_service.repository.httpclient.UserProfileClient;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -48,6 +49,7 @@ public class EventService {
     IdentityClient identityClient;
     FileClient fileClient;
     KafkaTemplate<String, Object> kafkaTemplate;
+    UserProfileClient userProfileClient;
 
     @PreAuthorize("hasRole('EVENT_MANAGER')")
     public EventResponse create (EventCreationRequest request, MultipartFile file){
@@ -155,6 +157,8 @@ public class EventService {
         EventResponse eventResponse = eventMapper.toEventResponse(event);
         String formatCreatedDate = dateTimeFormatter.format(event.getCreatedDate());
         eventResponse.setCreatedDate(formatCreatedDate);
+        eventResponse.setManagerUsername(
+                userProfileClient.findById(event.getManagerId()).getData().getUsername());
         return eventResponse;
     }
 }

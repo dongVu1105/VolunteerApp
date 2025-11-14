@@ -47,6 +47,7 @@ public class EventUserService {
     KafkaTemplate<String, Object> kafkaTemplate;
     UserProfileClient userProfileClient;
     EventMapper eventMapper;
+    DateTimeFormatter dateTimeFormatter;
 
     public EventUserResponse eventRegistration (EventUserCreationRequest request){
         Event event = eventRepository.findById(request.getEventId())
@@ -111,7 +112,7 @@ public class EventUserService {
         List<String> eventIdList = new ArrayList<>();
         eventUserPage.getContent().forEach(eventUser -> eventIdList.add(eventUser.getEventId()));
         List<EventResponse> eventResponseList = eventRepository.findAllByIdIn(eventIdList)
-                .stream().map(eventMapper::toEventResponse).toList();
+                .stream().map(this::toEventResponse).toList();
         return PageResponse.<EventResponse>builder()
                 .currentPage(page)
                 .pageSize(eventUserPage.getSize())
@@ -336,6 +337,15 @@ public class EventUserService {
         StringJoiner stringJoiner = new StringJoiner("_");
         hashList.forEach(stringJoiner::add);
         return stringJoiner.toString();
+    }
+
+    private EventResponse toEventResponse (Event event){
+        EventResponse eventResponse = eventMapper.toEventResponse(event);
+        String formatCreatedDate = dateTimeFormatter.format(event.getCreatedDate());
+        eventResponse.setCreatedDate(formatCreatedDate);
+        eventResponse.setManagerUsername(
+                userProfileClient.findById(event.getManagerId()).getData().getUsername());
+        return eventResponse;
     }
 
 

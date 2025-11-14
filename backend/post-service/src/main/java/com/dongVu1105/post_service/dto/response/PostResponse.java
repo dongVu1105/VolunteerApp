@@ -14,6 +14,11 @@ public class PostResponse {
     String id;
     String eventId;
     String ownerId;
+    String ownerUsername;
+    String ownerAvatar;
+    long reactCount;
+    long commentCount;
+    boolean isReactedByCurrentUser;
     String text;
     String imageURL;
     String createdDate;

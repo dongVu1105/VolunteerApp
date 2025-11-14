@@ -10,7 +10,9 @@ import com.dongVu1105.post_service.entity.Post;
 import com.dongVu1105.post_service.exception.AppException;
 import com.dongVu1105.post_service.exception.ErrorCode;
 import com.dongVu1105.post_service.mapper.PostMapper;
+import com.dongVu1105.post_service.repository.CommentRepository;
 import com.dongVu1105.post_service.repository.PostRepository;
+import com.dongVu1105.post_service.repository.ReactRepository;
 import com.dongVu1105.post_service.repository.httpClient.EventClient;
 import com.dongVu1105.post_service.repository.httpClient.FileClient;
 import com.dongVu1105.post_service.repository.httpClient.UserProfileClient;
@@ -44,6 +46,10 @@ public class PostService {
     FileClient fileClient;
     KafkaTemplate<String, Object> kafkaTemplate;
     UserProfileClient userProfileClient;
+    ReactService reactService;
+    CommentService commentService;
+    ReactRepository reactRepository;
+    CommentRepository commentRepository;
 
     public PostResponse create (MultipartFile file, PostRequest request){
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -67,13 +73,18 @@ public class PostService {
                 .eventId(post.getEventId())
                 .receiverId(receiverId)
                 .build());
-        return this.toPostResponse(post);
+        return this.toPostResponse(post, userProfileResponse);
     }
 
     public PostResponse findById (String id){
         Post post = postRepository.findById(id).orElseThrow(
                 () -> new AppException(ErrorCode.POST_NOT_EXISTED));
-        return toPostResponse(post);
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserProfileResponse userProfileResponse = userProfileClient.findById(userId).getData();
+        if(Objects.isNull(userProfileResponse)){
+            log.error(ErrorCode.UNCONNECTED_SERVICE.getMessage());
+        }
+        return toPostResponse(post, userProfileResponse);
     }
 
     public void delete (String postId){
@@ -101,7 +112,13 @@ public class PostService {
         Sort sort = Sort.by("createdDate").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         Page<Post> postPage = postRepository.findAllByEventId(eventId, pageable);
-        var postData = postPage.getContent().stream().map(this::toPostResponse).toList();
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserProfileResponse userProfileResponse = userProfileClient.findById(userId).getData();
+        if(Objects.isNull(userProfileResponse)){
+            log.error(ErrorCode.UNCONNECTED_SERVICE.getMessage());
+        }
+        var postData = postPage.getContent().stream()
+                .map(post -> this.toPostResponse(post, userProfileResponse)).toList();
         return PageResponse.<PostResponse>builder()
                 .currentPage(page)
                 .pageSize(size)
@@ -127,9 +144,15 @@ public class PostService {
 
 
 
-    private PostResponse toPostResponse (Post post){
+    private PostResponse toPostResponse (Post post, UserProfileResponse userProfileResponse){
         PostResponse postResponse = postMapper.toPostResponse(post);
         postResponse.setCreatedDate(dateTimeFormatter.format(post.getCreatedDate()));
+        postResponse.setOwnerUsername(userProfileResponse.getUsername());
+        postResponse.setOwnerAvatar(userProfileResponse.getAvatar());
+        postResponse.setReactedByCurrentUser(reactRepository
+                .existsByPostIdAndOwnerId(postResponse.getId(), userProfileResponse.getUserId()));
+        postResponse.setReactCount(reactRepository.countByPostId(postResponse.getId()));
+        postResponse.setCommentCount(commentRepository.countByPostId(postResponse.getId()));
         return postResponse;
     }
 }
