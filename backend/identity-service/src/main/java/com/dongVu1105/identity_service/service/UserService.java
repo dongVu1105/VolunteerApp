@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -58,7 +59,13 @@ public class UserService {
         }
         ProfileCreationRequest profileCreationRequest = profileMapper.toProfileCreationRequest(request);
         profileCreationRequest.setUserId(user.getId());
-        UserProfileResponse userProfileResponse = userProfileClient.create(profileCreationRequest).getData();
+        UserProfileResponse userProfileResponse = null;
+        try {
+            userProfileResponse = userProfileClient.create(profileCreationRequest).getData();
+        } catch (Exception e) {
+            userRepository.deleteById(user.getId());
+            throw new AppException(ErrorCode.FAIL_REGISTRATION);
+        }
         return UserResponse.builder()
                 .id(user.getId())
                 .role(user.getRole())
