@@ -1,0 +1,1168 @@
+{
+	"info": {
+		"_postman_id": "d208dd74-34e1-44dd-b922-588a1f89d89b",
+		"name": "Volunteer Hub",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "40876671"
+	},
+	"item": [
+		{
+			"name": "register",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\" : \"user3@gmail.com\",\r\n    \"password\" : \"123456789\",\r\n    \"username\" : \"user1\",\r\n    \"firstName\" : \"user\",\r\n    \"lastName\" : \"user_1\",\r\n    \"phoneNumber\" : \"0987654321\",\r\n    \"birthday\" : \"2025-01-10\",\r\n    \"gender\" : \"true\",\r\n    \"role\" : [\"USER\"]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8080/identity/user/register"
+			},
+			"response": []
+		},
+		{
+			"name": "all notification",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1N2NlNTJlMi1lNzUyLTQyOWMtYmU0NC05YjYyNzJiODYyODQiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX1VTRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYyODQxNTM3LCJpYXQiOjE3NjI4NDA1MzcsImp0aSI6ImQyMmQwNWUwLWJjMjEtNGNmOS05Nzg4LTcwMmVkYWI5MWExMCJ9.G7jvrA5spvIxPIRw-1vC1FwJPGVTWEJQ0NZO1vjgf99RA0ShhHgP4W6fea-EsuPOirmcC5E0ohYtkMwnOpCu0A"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "page",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "size",
+							"value": "2",
+							"type": "text"
+						},
+						{
+							"key": "userId",
+							"value": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/notification/find-all"
+			},
+			"response": []
+		},
+		{
+			"name": "create event",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5OGUyOTEzNi04YmU0LTQ2NDYtYTI3Yy05NDhmMjBkMGU0NDgiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0VWRU5UX01BTkFHRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYyMTQ3NTkzLCJpYXQiOjE3NjIxNDY1OTMsImp0aSI6IjRjZGU4YTYwLTc3ZWMtNDZhYy05MzFiLTI3M2ZmY2ZmYzRmMiJ9.tIlT8n_gi96T6bxMnI-599XdwWQpDEQnNP63ctSY6r_dfnoCfOXieiSqy6PxKbEN3XYbcVSIKQEZLLa_gDvi0g"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "request",
+							"value": "{\n  \"title\": \"Hội thảo Công nghệ AI 2026\",\n  \"location\": \"Hội trường A, Đại học B\",\n  \"description\": \"Sự kiện giới thiệu các xu hướng mới nhất trong lĩnh vực Trí tuệ Nhân tạo và Machine Learning.\",\n  \"startDate\": \"2025-11-15T08:00:00Z\",\n  \"finishDate\": \"2025-11-15T17:00:00Z\",\n  \"category\": \"Bình dân học vụ số\"\n}",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": []
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/event/create"
+			},
+			"response": []
+		},
+		{
+			"name": "user register event",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhODI1M2NjMi04NzQ1LTQwNTctYjJmMi1lYjllYjg2NzgxOGYiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX1VTRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYyMTY5OTA0LCJpYXQiOjE3NjIxNjg5MDQsImp0aSI6IjI1OGEyZTU5LWY4MjAtNGQyMS1iNmJiLTFkZTFhN2U1MTBiNCJ9.RMDJub96GP-241Vy4oAK1FW1mEb4xU8183-w9IiN3YqILEBYNmJYjUXnjHmHtk_gFU3N8zgYsUg4Ecwpj8n4wQ"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"eventId\" : \"69082ebcc4dc4e1bec2d87b7\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8888/api/v1/event/user/register"
+			},
+			"response": []
+		},
+		{
+			"name": "user check my completed event",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOGQ5OWMyYi1jYzVhLTRhZDQtYTZhNC03NDAzMTc2YTA0ZDMiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX1VTRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYzMTQxMDU2LCJpYXQiOjE3NjMxNDAwNTYsImp0aSI6IjE4NjNiOTVmLWZmOTQtNGVhMC1hZmZhLWQxZmFjZmUwNDNkMSJ9.R8cVPg8fUscEqurpqyqd9VFFza4Uf1Nn_AKEnYivkmITLnDe8qugyK9nGQN0mZN3LO5uYibFZnOSoZEYezqlOA"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "page",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "size",
+							"value": "5",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/event/user/completed-event"
+			},
+			"response": []
+		},
+		{
+			"name": "user delete event",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1N2NlNTJlMi1lNzUyLTQyOWMtYmU0NC05YjYyNzJiODYyODQiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX1VTRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYyODQxNTM3LCJpYXQiOjE3NjI4NDA1MzcsImp0aSI6ImQyMmQwNWUwLWJjMjEtNGNmOS05Nzg4LTcwMmVkYWI5MWExMCJ9.G7jvrA5spvIxPIRw-1vC1FwJPGVTWEJQ0NZO1vjgf99RA0ShhHgP4W6fea-EsuPOirmcC5E0ohYtkMwnOpCu0A"
+					}
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"eventId\" : \"69082ebcc4dc4e1bec2d87b7\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8888/api/v1/event/user/unsubscribe/6912ceb6f9a0c395494a385b"
+			},
+			"response": []
+		},
+		{
+			"name": "manager get pending user",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhODI1M2NjMi04NzQ1LTQwNTctYjJmMi1lYjllYjg2NzgxOGYiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX1VTRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYyMTY5OTA0LCJpYXQiOjE3NjIxNjg5MDQsImp0aSI6IjI1OGEyZTU5LWY4MjAtNGQyMS1iNmJiLTFkZTFhN2U1MTBiNCJ9.RMDJub96GP-241Vy4oAK1FW1mEb4xU8183-w9IiN3YqILEBYNmJYjUXnjHmHtk_gFU3N8zgYsUg4Ecwpj8n4wQ"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "page",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "size",
+							"value": "2",
+							"type": "text"
+						},
+						{
+							"key": "eventId",
+							"value": "1",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/event/user/pending"
+			},
+			"response": []
+		},
+		{
+			"name": "manager get attending user",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5OGUyOTEzNi04YmU0LTQ2NDYtYTI3Yy05NDhmMjBkMGU0NDgiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0VWRU5UX01BTkFHRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYzMDE3NjY0LCJpYXQiOjE3NjMwMTY2NjQsImp0aSI6ImE5ZTk0MDgzLWFjZWYtNDZiNi1hNjBlLTI0YTJjOTQyZDU5MyJ9.Ks93AfPNwF4o_AdScmq58Jn91ljLwarfjL3_tK4b2St736DDZoIm4Ob7ueCnR3uGep6OOgYRDmSICLsxCmoyHg"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "page",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "size",
+							"value": "3",
+							"type": "text"
+						},
+						{
+							"key": "eventId",
+							"value": "69157ef90858864a496cbfe8",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/event/user/attending"
+			},
+			"response": []
+		},
+		{
+			"name": "manager get all user in event",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5OGUyOTEzNi04YmU0LTQ2NDYtYTI3Yy05NDhmMjBkMGU0NDgiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0VWRU5UX01BTkFHRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYzMDE3MDUzLCJpYXQiOjE3NjMwMTYwNTMsImp0aSI6IjkzOWFkOTJhLWZiN2EtNDhhZC1iOWRhLWNlODY2ZWM5MTkwNCJ9.R7Acd1m22q6DrFhEZes68Ze5v-6VQTey2uIkLfts29yKrCkedY_7hl4B59kpxd16B-L92m3Rg5SMXKvx3Rd5dQ"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "page",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "size",
+							"value": "3",
+							"type": "text"
+						},
+						{
+							"key": "eventId",
+							"value": "69157ef90858864a496cbfe8",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/event/user/find-all"
+			},
+			"response": []
+		},
+		{
+			"name": "manager accept pending user",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5OGUyOTEzNi04YmU0LTQ2NDYtYTI3Yy05NDhmMjBkMGU0NDgiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0VWRU5UX01BTkFHRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYyMTcwOTIxLCJpYXQiOjE3NjIxNjk5MjEsImp0aSI6IjkzYmZiNDljLTliOGEtNDI2ZC1hM2RlLWM5YmI1MTZjODM4OCJ9.eiUEbXAaNg_lvBNP97UhY7M6mi3HQ2zr9Ntd0szAVgNdgxV3ZEcxoBwD5D-_69KNe0BNBjkW2JCBPFqW34PXVQ"
+					}
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "page",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "size",
+							"value": "2",
+							"type": "text"
+						},
+						{
+							"key": "eventId",
+							"value": "1",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/event/user/accept-registration/690893e7fbb635940fda5534"
+			},
+			"response": []
+		},
+		{
+			"name": "manager confirm completion user",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5OGUyOTEzNi04YmU0LTQ2NDYtYTI3Yy05NDhmMjBkMGU0NDgiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0VWRU5UX01BTkFHRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYyOTY0NDM3LCJpYXQiOjE3NjI5NjM0MzcsImp0aSI6IjgxZDZkOTQzLTI5ZTMtNGQ1MC1iN2VhLTQ2MDcyYzBkOWMxMCJ9.vGiaJkT0E5V55GqOEq8jqY7kMs7zL4zVC35r-OibMTbaF4OrK66mmEle4xP4zLy_uF5LOptX8OW4eMeTSaYzWw"
+					}
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "page",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "size",
+							"value": "2",
+							"type": "text"
+						},
+						{
+							"key": "eventId",
+							"value": "1",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/event/user/confirm-completion/6914af71a64d6559b1aac0fe"
+			},
+			"response": []
+		},
+		{
+			"name": "manager reject pending user",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5OGUyOTEzNi04YmU0LTQ2NDYtYTI3Yy05NDhmMjBkMGU0NDgiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0VWRU5UX01BTkFHRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYzMDE3MDUzLCJpYXQiOjE3NjMwMTYwNTMsImp0aSI6IjkzOWFkOTJhLWZiN2EtNDhhZC1iOWRhLWNlODY2ZWM5MTkwNCJ9.R7Acd1m22q6DrFhEZes68Ze5v-6VQTey2uIkLfts29yKrCkedY_7hl4B59kpxd16B-L92m3Rg5SMXKvx3Rd5dQ"
+					}
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "page",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "size",
+							"value": "2",
+							"type": "text"
+						},
+						{
+							"key": "eventId",
+							"value": "1",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/event/user/reject-registration/69157d62c49df4484f971e2c"
+			},
+			"response": []
+		},
+		{
+			"name": "update event",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxZGYyMDc0Mi1jMGYxLTQ4NDMtYmUzZS04MzFkZmMzNzZhMDEiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0FETUlOIiwiaXNzIjoidGVhbTE2LmNvbSIsImV4cCI6MTc2MjI1MzUzNCwiaWF0IjoxNzYyMjUyNTM0LCJqdGkiOiJmN2MyOWJmYS0wNGY1LTRiODctYTg0OS01ODRlMWE0ZWUyMzYifQ._ytTnGv5m7_wiCMpwnW9fGzOOWtJ5BT1op8OKTOKEemOG63hN5k_JVSHwZkh1Qd5g21K25na2M97tiTXZ8KbRw"
+					}
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "request",
+							"value": "{\n  \"id\" : \"69082f33c4dc4e1bec2d87b8\",\n  \"title\": \"Hội thảo Công nghệ AI 2028\",\n  \"location\": \"Hội trường A, Đại học C\",\n  \"description\": \"Sự kiện giới thiệu các xu hướng mới nhất trong lĩnh vực Trí tuệ Nhân tạo và Machine Learning.\",\n  \"startDate\": \"2025-10-15T08:00:00Z\",\n  \"finishDate\": \"2025-11-15T17:00:00Z\",\n  \"category\": \"Từ thiện\"\n}",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/Admin/Downloads/grade.jpg"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/event/update/"
+			},
+			"response": []
+		},
+		{
+			"name": "find event by category and date",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOGQ5OWMyYi1jYzVhLTRhZDQtYTZhNC03NDAzMTc2YTA0ZDMiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX1VTRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYzMTQxMDU2LCJpYXQiOjE3NjMxNDAwNTYsImp0aSI6IjE4NjNiOTVmLWZmOTQtNGVhMC1hZmZhLWQxZmFjZmUwNDNkMSJ9.R8cVPg8fUscEqurpqyqd9VFFza4Uf1Nn_AKEnYivkmITLnDe8qugyK9nGQN0mZN3LO5uYibFZnOSoZEYezqlOA"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "page",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "size",
+							"value": "5",
+							"type": "text"
+						},
+						{
+							"key": "category",
+							"value": "Trồng cây",
+							"type": "text"
+						},
+						{
+							"key": "fromDate",
+							"value": "2025-11-10T08:00:00Z",
+							"type": "text"
+						},
+						{
+							"key": "toDate",
+							"value": "2025-11-14T08:00:00Z",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/event/category-date"
+			},
+			"response": []
+		},
+		{
+			"name": "find event by id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5OGUyOTEzNi04YmU0LTQ2NDYtYTI3Yy05NDhmMjBkMGU0NDgiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0VWRU5UX01BTkFHRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYyMTQ4ODM0LCJpYXQiOjE3NjIxNDc4MzQsImp0aSI6ImEwNDU1ZjZlLTg0OGQtNGFjNi1iZGIzLTY4MDIxN2MxYTNhMiJ9.maaKW6LbZwi1yw9DOBTDLltUAiqi7fp0MP9vgr3Jx8GsZqezHRVARZweUBvWcI1eotzC33oZxBeVeYbUuN8BVA"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "page",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "size",
+							"value": "1",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/event/69082ebcc4dc4e1bec2d87b7"
+			},
+			"response": []
+		},
+		{
+			"name": "find pending event",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxZGYyMDc0Mi1jMGYxLTQ4NDMtYmUzZS04MzFkZmMzNzZhMDEiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0FETUlOIiwiaXNzIjoidGVhbTE2LmNvbSIsImV4cCI6MTc2Mjg0NzYyNiwiaWF0IjoxNzYyODQ2NjI2LCJqdGkiOiIwZDBmMzVjNS0wMDNmLTRmZmYtODAzMy04MTMxMmE3NjRiMDQifQ.oghUi_o3OmFkxOTlig1qECXfFCHpa8zeA63AxgTpbt-AHD68q--e9LHNsIdAvIRriJCUxTY5qDguC-6yxH1wfA"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "page",
+							"value": "3",
+							"type": "text"
+						},
+						{
+							"key": "size",
+							"value": "10",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/event/pending"
+			},
+			"response": []
+		},
+		{
+			"name": "delete event",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxZGYyMDc0Mi1jMGYxLTQ4NDMtYmUzZS04MzFkZmMzNzZhMDEiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0FETUlOIiwiaXNzIjoidGVhbTE2LmNvbSIsImV4cCI6MTc2MjI1MzUzNCwiaWF0IjoxNzYyMjUyNTM0LCJqdGkiOiJmN2MyOWJmYS0wNGY1LTRiODctYTg0OS01ODRlMWE0ZWUyMzYifQ._ytTnGv5m7_wiCMpwnW9fGzOOWtJ5BT1op8OKTOKEemOG63hN5k_JVSHwZkh1Qd5g21K25na2M97tiTXZ8KbRw"
+					}
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "page",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "size",
+							"value": "1",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/event/delete/6909d9537e4e8ff0d2d90ee3"
+			},
+			"response": []
+		},
+		{
+			"name": "accept event",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxZGYyMDc0Mi1jMGYxLTQ4NDMtYmUzZS04MzFkZmMzNzZhMDEiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0FETUlOIiwiaXNzIjoidGVhbTE2LmNvbSIsImV4cCI6MTc2Mjk2NDA3MywiaWF0IjoxNzYyOTYzMDczLCJqdGkiOiI2MDllY2Y0Yi1kYWVjLTQ3ZWMtODZjOC05Yzg4MTBiNmIzNjYifQ.KuJkD2VEL9h4seWlPqgiFJYaWGD0bPCyhv6T5NfZQfpNVTnyws6VkI4NMKuE2EcLqdpeIKvMWQ7lY8ehh1rBvA"
+					}
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "page",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "size",
+							"value": "1",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/event/accept/69157ef90858864a496cbfe8"
+			},
+			"response": []
+		},
+		{
+			"name": "login (manager)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\" : \"user7@gmail.com\",\r\n    \"password\" : \"123456789\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8888/api/v1/identity/auth/login"
+			},
+			"response": []
+		},
+		{
+			"name": "login (user)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\" : \"user20@gmail.com\",\r\n    \"password\" : \"123456789\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8888/api/v1/identity/auth/login"
+			},
+			"response": []
+		},
+		{
+			"name": "login (admin)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\" : \"admin@gmail.com\",\r\n    \"password\" : \"admin\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8888/api/v1/identity/auth/login"
+			},
+			"response": []
+		},
+		{
+			"name": "refresh token",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"accessToken\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxZGYyMDc0Mi1jMGYxLTQ4NDMtYmUzZS04MzFkZmMzNzZhMDEiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0FETUlOIiwiaXNzIjoidGVhbTE2LmNvbSIsImV4cCI6MTc2MTY2MDU1NiwiaWF0IjoxNzYxNjU5NTU2LCJqdGkiOiJlZjFiYjJjMy05MzJmLTRlZjUtODdlYS1kNDg3NWVkNzZjNDEifQ.Feat3CuHV0gYgY8iiaUq9S-KhVjDEcJ21EN0631BueVfPJlCqjqGCuZq7POo0FDE734mf_r1jU5BVAcSWmhPOQ\",\r\n    \"refreshToken\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxZGYyMDc0Mi1jMGYxLTQ4NDMtYmUzZS04MzFkZmMzNzZhMDEiLCJ0b2tlbi10eXBlIjoicmVmcmVzaCIsInNjb3BlIjoiUk9MRV9BRE1JTiIsImlzcyI6InRlYW0xNi5jb20iLCJleHAiOjE3NjE2ODk1NTYsImlhdCI6MTc2MTY1OTU1NiwianRpIjoiMDk2YjI5ZjYtYjIyNC00OGUzLWFjNjEtZWIzOWJkY2FjY2ZmIn0.33gNOT7oMLe6-V1BMPa3kRI3szO60pEJ3w4oIvg7tIdB38lWLcYARjZN1G-1tHnFo-XuxoJ37cMbqaQXvq5gog\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8888/api/v1/identity/auth/refresh-token"
+			},
+			"response": []
+		},
+		{
+			"name": "logout",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"accessToken\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxZGYyMDc0Mi1jMGYxLTQ4NDMtYmUzZS04MzFkZmMzNzZhMDEiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0FETUlOIiwiaXNzIjoidGVhbTE2LmNvbSIsImV4cCI6MTc2MTY2MDU1NiwiaWF0IjoxNzYxNjU5NTU2LCJqdGkiOiJlZjFiYjJjMy05MzJmLTRlZjUtODdlYS1kNDg3NWVkNzZjNDEifQ.Feat3CuHV0gYgY8iiaUq9S-KhVjDEcJ21EN0631BueVfPJlCqjqGCuZq7POo0FDE734mf_r1jU5BVAcSWmhPOQ\",\r\n    \"refreshToken\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxZGYyMDc0Mi1jMGYxLTQ4NDMtYmUzZS04MzFkZmMzNzZhMDEiLCJ0b2tlbi10eXBlIjoicmVmcmVzaCIsInNjb3BlIjoiUk9MRV9BRE1JTiIsImlzcyI6InRlYW0xNi5jb20iLCJleHAiOjE3NjE2ODk1NTYsImlhdCI6MTc2MTY1OTU1NiwianRpIjoiMDk2YjI5ZjYtYjIyNC00OGUzLWFjNjEtZWIzOWJkY2FjY2ZmIn0.33gNOT7oMLe6-V1BMPa3kRI3szO60pEJ3w4oIvg7tIdB38lWLcYARjZN1G-1tHnFo-XuxoJ37cMbqaQXvq5gog\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8888/api/v1/identity/auth/logout"
+			},
+			"response": []
+		},
+		{
+			"name": "introspect",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"accessToken\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjMWQyZjU2NS0yYmMwLTQ0YzktOWQ0Yy03NzU1YjM1YWUwNTIiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX1VTRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYxNjU4NDk0LCJpYXQiOjE3NjE2NTc0OTQsImp0aSI6IjNhOGE5NTQxLWU1YTUtNDgwNi1iZGE1LTFjODI4ZTVjMDY4NyJ9.ySdCZiUht8Nio6iIS3KFRHCNoqiIQkf-70buBlTNd-qfDya7pXvdunS4VRqBpAuih8DXBivu9C6HTqfRIn384A\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8888/api/v1/identity/auth/introspect"
+			},
+			"response": []
+		},
+		{
+			"name": "upload file",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxZGYyMDc0Mi1jMGYxLTQ4NDMtYmUzZS04MzFkZmMzNzZhMDEiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0FETUlOIiwiaXNzIjoidGVhbTE2LmNvbSIsImV4cCI6MTc2Mjc5OTU0OSwiaWF0IjoxNzYyNzk4NTQ5LCJqdGkiOiJiMTE0NjE5Mi1mZmZmLTQxNjAtODc2Yi01YWE4M2Y4MGNmZGYifQ.flxd1zO_F6CYgrsHJ8eFsEr30REElWJ_vRhtH_xcTGMYnI3T3WV0O24XQLFQZZWnPP78MVwbu8V8vYBdXgSehw"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/Admin/Downloads/360_F_496033914_CR1nlKAIIzB2HYPyEwI6yCThGsPjEtIT.jpg"
+						}
+					]
+				},
+				"url": "http://localhost:8082/file/internal/media/upload"
+			},
+			"response": []
+		},
+		{
+			"name": "download file",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxZGYyMDc0Mi1jMGYxLTQ4NDMtYmUzZS04MzFkZmMzNzZhMDEiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0FETUlOIiwiaXNzIjoidGVhbTE2LmNvbSIsImV4cCI6MTc2MTg0NDE4OSwiaWF0IjoxNzYxODQzMTg5LCJqdGkiOiJiYjY0MmIyNS1mZTI3LTRlY2EtYjUyMC05Njk1ZTI2YmZjYzMifQ.pAavKFwyU_Udz7pL7UjdgwBKNmBHon4hMO3Gr-23oU5MGXi66G8CUvCrd5YyZP150kw1Qy6ytZDXzpfeLX5liQ"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/Admin/Downloads/grade.jpg"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/file/media/download/"
+			},
+			"response": []
+		},
+		{
+			"name": "create post",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "request",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": []
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/post/create"
+			},
+			"response": []
+		},
+		{
+			"name": "create react",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOGQ5OWMyYi1jYzVhLTRhZDQtYTZhNC03NDAzMTc2YTA0ZDMiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX1VTRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYzMTQxMDU2LCJpYXQiOjE3NjMxNDAwNTYsImp0aSI6IjE4NjNiOTVmLWZmOTQtNGVhMC1hZmZhLWQxZmFjZmUwNDNkMSJ9.R8cVPg8fUscEqurpqyqd9VFFza4Uf1Nn_AKEnYivkmITLnDe8qugyK9nGQN0mZN3LO5uYibFZnOSoZEYezqlOA"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "request",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": []
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/post/react/create/691763e048f68cd4c0b0c5a6"
+			},
+			"response": []
+		},
+		{
+			"name": "create comment",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOGQ5OWMyYi1jYzVhLTRhZDQtYTZhNC03NDAzMTc2YTA0ZDMiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX1VTRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYyNzk1MzkxLCJpYXQiOjE3NjI3OTQzOTEsImp0aSI6ImIxZjYxY2EzLTZlYzMtNGZiOC04MDY5LTNiYjYzNmY5NTc4MiJ9.uKPxQondQvA9_oirUHrpPcLnRAwHmOlZbRxv66tWxaUiDXRNibxRQNuVbR-p0v0cUHS_yAJCw2FVBeLqa1qjQw"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "request",
+							"value": "{\n    \"postId\" : \"69121d42d454d33d4a3ba96c\",\n    \"text\" : \"what's up\"\n}",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/Admin/Downloads/LOW01306.jpg"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/post/comment/create"
+			},
+			"response": []
+		},
+		{
+			"name": "delete post",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5OGUyOTEzNi04YmU0LTQ2NDYtYTI3Yy05NDhmMjBkMGU0NDgiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0VWRU5UX01BTkFHRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYyNzk2ODY0LCJpYXQiOjE3NjI3OTU4NjQsImp0aSI6ImY3MTE0MTMxLWQzOTQtNDQ5Zi1hZDg2LTI3MjhlYjgyMmQzNSJ9.QGpa7jIsZgLOUbgjqFJ7zW2g0RxS-e9PYJowjorN8dE2BrOFuJ-Qp1cTH_ea-E1QLKVDUnB2jJ7R6LfncbzdDQ"
+					}
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "request",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": []
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/post/delete/69121d42d454d33d4a3ba96c"
+			},
+			"response": []
+		},
+		{
+			"name": "delete react",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOGQ5OWMyYi1jYzVhLTRhZDQtYTZhNC03NDAzMTc2YTA0ZDMiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX1VTRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYyNzk2ODAxLCJpYXQiOjE3NjI3OTU4MDEsImp0aSI6IjFiZTcxMjJiLTc3YWItNDM4ZS04MzdhLWVlNTFiMDkyMThhZSJ9.rlOkvwb9kDTdRMqGjfwusE8onU7-7AbmWd-fzgGko_q1KDFsLER9-xXB-L6-Nq2UpsUwSnnzfc2vFAVm9FxcnA"
+					}
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "request",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": []
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/post/react/delete/69121e04d454d33d4a3ba96d"
+			},
+			"response": []
+		},
+		{
+			"name": "delete comment",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOGQ5OWMyYi1jYzVhLTRhZDQtYTZhNC03NDAzMTc2YTA0ZDMiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX1VTRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYyNzk2ODAxLCJpYXQiOjE3NjI3OTU4MDEsImp0aSI6IjFiZTcxMjJiLTc3YWItNDM4ZS04MzdhLWVlNTFiMDkyMThhZSJ9.rlOkvwb9kDTdRMqGjfwusE8onU7-7AbmWd-fzgGko_q1KDFsLER9-xXB-L6-Nq2UpsUwSnnzfc2vFAVm9FxcnA"
+					}
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "request",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "file",
+							"type": "file",
+							"src": []
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/post/comment/delete/69121e88d454d33d4a3ba96e"
+			},
+			"response": []
+		},
+		{
+			"name": "find all post",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhNDM3ZTg0Ny0zNGNiLTQxZTMtYjU4ZC05MmFkZjhjMWM2NDkiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX1VTRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYzMTQyNDI1LCJpYXQiOjE3NjMxNDE0MjUsImp0aSI6Ijc3MmRhZDBkLTg5YjMtNGZkYS1hODk0LWYyYWExYzgyZWU0MSJ9.ML0lnLOjyMNGTt1DhXOdxxehDMOdgSEIE7ghPjQA5bRc_t9NFHC-55VHJPmH3_JgCooa2dj97T_R8KTe8MwipQ"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "page",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "size",
+							"value": "2",
+							"type": "text"
+						},
+						{
+							"key": "eventId",
+							"value": "69082ebcc4dc4e1bec2d87b7",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/post/find-all"
+			},
+			"response": []
+		},
+		{
+			"name": "is reacted",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxOGQ5OWMyYi1jYzVhLTRhZDQtYTZhNC03NDAzMTc2YTA0ZDMiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX1VTRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYyNzk2ODAxLCJpYXQiOjE3NjI3OTU4MDEsImp0aSI6IjFiZTcxMjJiLTc3YWItNDM4ZS04MzdhLWVlNTFiMDkyMThhZSJ9.rlOkvwb9kDTdRMqGjfwusE8onU7-7AbmWd-fzgGko_q1KDFsLER9-xXB-L6-Nq2UpsUwSnnzfc2vFAVm9FxcnA"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "page",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "size",
+							"value": "2",
+							"type": "text"
+						},
+						{
+							"key": "eventId",
+							"value": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/post/react/is-reacted/69121d42d454d33d4a3ba96c"
+			},
+			"response": []
+		},
+		{
+			"name": "find all react",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "page",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "size",
+							"value": "2",
+							"type": "text"
+						},
+						{
+							"key": "postId",
+							"value": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/post/react/find-by-postId"
+			},
+			"response": []
+		},
+		{
+			"name": "find all comment",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "page",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "size",
+							"value": "2",
+							"type": "text"
+						},
+						{
+							"key": "postId",
+							"value": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/post/comment/find-by-postId"
+			},
+			"response": []
+		},
+		{
+			"name": "lock account",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxZGYyMDc0Mi1jMGYxLTQ4NDMtYmUzZS04MzFkZmMzNzZhMDEiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0FETUlOIiwiaXNzIjoidGVhbTE2LmNvbSIsImV4cCI6MTc2Mjg1MDE5NCwiaWF0IjoxNzYyODQ5MTk0LCJqdGkiOiI5MTc5M2ExYi04NTY5LTRhYzctODZlMy04OGRkN2JjY2VlZTgifQ.ErR_3Fgl5y7lhsGlIbq6O7D8FBivgzaIbwt1MFXKbIkd8sB46zwsffjvFoTtxMb6H_ED4n0Z48lR_cVd0bPLUw"
+					}
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\" : \"admin@gmail.com\",\r\n    \"password\" : \"admin\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8888/api/v1/identity/user/lock/"
+			},
+			"response": []
+		},
+		{
+			"name": "unlock account",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxZGYyMDc0Mi1jMGYxLTQ4NDMtYmUzZS04MzFkZmMzNzZhMDEiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0FETUlOIiwiaXNzIjoidGVhbTE2LmNvbSIsImV4cCI6MTc2Mjg1MDE5NCwiaWF0IjoxNzYyODQ5MTk0LCJqdGkiOiI5MTc5M2ExYi04NTY5LTRhYzctODZlMy04OGRkN2JjY2VlZTgifQ.ErR_3Fgl5y7lhsGlIbq6O7D8FBivgzaIbwt1MFXKbIkd8sB46zwsffjvFoTtxMb6H_ED4n0Z48lR_cVd0bPLUw"
+					}
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\" : \"admin@gmail.com\",\r\n    \"password\" : \"admin\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8888/api/v1/identity/user/unlock/2ee009dc-7958-4e16-bc27-af2f654218b4"
+			},
+			"response": []
+		},
+		{
+			"name": "find-all-account Copy",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxZGYyMDc0Mi1jMGYxLTQ4NDMtYmUzZS04MzFkZmMzNzZhMDEiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0FETUlOIiwiaXNzIjoidGVhbTE2LmNvbSIsImV4cCI6MTc2Mjg1MDE5NCwiaWF0IjoxNzYyODQ5MTk0LCJqdGkiOiI5MTc5M2ExYi04NTY5LTRhYzctODZlMy04OGRkN2JjY2VlZTgifQ.ErR_3Fgl5y7lhsGlIbq6O7D8FBivgzaIbwt1MFXKbIkd8sB46zwsffjvFoTtxMb6H_ED4n0Z48lR_cVd0bPLUw"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\" : \"admin@gmail.com\",\r\n    \"password\" : \"admin\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8888/api/v1/identity/user/find-all-account"
+			},
+			"response": []
+		},
+		{
+			"name": "find all catgories",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1N2NlNTJlMi1lNzUyLTQyOWMtYmU0NC05YjYyNzJiODYyODQiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX1VTRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYyODYyNTgzLCJpYXQiOjE3NjI4NjE1ODMsImp0aSI6ImEwODZjZDFmLTE3NDQtNDE3Mi1hM2JiLTk0NDYyMjlhMDNjZCJ9.Vq9S6bFterBo2okusFAp1sYARo4HnQgEfsstu59MEGtRCuSDHPSW8JpSTM9j4-mjRIgI8EAfN4p6SQ9hoHl5gg"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8888/api/v1/event/categories"
+			},
+			"response": []
+		}
+	]
+}

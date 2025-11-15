@@ -1,0 +1,9 @@
+services:
+  neo4j:
+    image: neo4j:5.24.2
+    container_name: neo4j
+    hostname: neo4j
+    restart: no
+    ports:
+      - '7474:7474'
+      - '7687:7687'
