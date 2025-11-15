@@ -11,4 +11,6 @@ import org.springframework.stereotype.Repository;
 public interface ReactRepository extends MongoRepository<React, String> {
     Page<React> findAllByPostId (String postId, Pageable pageable);
     boolean existsByPostIdAndOwnerId (String postId, String ownerId);
+    long countByPostId(String postId);
+
 }

@@ -78,6 +78,7 @@ public class UserService {
                 .phoneNumber(userProfileResponse.getPhoneNumber())
                 .username(userProfileResponse.getUsername())
                 .identityNumber(userProfileResponse.getIdentityNumber())
+                .avatar(userProfileResponse.getAvatar())
                 .build();
     }
 

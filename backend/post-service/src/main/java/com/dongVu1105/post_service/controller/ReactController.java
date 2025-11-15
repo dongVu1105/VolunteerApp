@@ -42,9 +42,4 @@ public class ReactController {
         return ApiResponse.<PageResponse<ReactResponse>>builder()
                 .data(reactService.findAllByPostId(page, size, postId)).build();
     }
-
-    @GetMapping("/is-reacted/{postId}")
-    public ApiResponse<Boolean> isReacted (@PathVariable("postId") String postId){
-        return ApiResponse.<Boolean>builder().data(reactService.isReacted(postId)).build();
-    }
 }

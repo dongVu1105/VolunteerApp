@@ -26,4 +26,5 @@ public class UserResponse {
     String identityNumber;
     boolean gender;
     Set<Role> role;
+    String avatar;
 }

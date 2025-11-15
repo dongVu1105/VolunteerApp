@@ -25,6 +25,7 @@ public class UserCreationRequest {
     String phoneNumber;
     String identityNumber;
     LocalDate birthday;
+    String avatar;
     boolean gender;
     Set<String> role;
 }

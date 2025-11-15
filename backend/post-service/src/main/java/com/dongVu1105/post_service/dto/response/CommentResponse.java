@@ -14,6 +14,8 @@ public class CommentResponse {
     String id;
     String postId;
     String ownerId;
+    String ownerUsername;
+    String ownerAvatar;
     String text;
     String imageURL;
     String createdDate;

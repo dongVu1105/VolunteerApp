@@ -69,7 +69,7 @@ public class ReactService {
                 .eventId(post.getEventId())
                 .receiverId(receiverId)
                 .build());
-        return toReactResponse(react);
+        return toReactResponse(react, userProfileResponse);
     }
 
     public void delete (String reactId){
@@ -94,20 +94,19 @@ public class ReactService {
         Sort sort = Sort.by("createdDate").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         Page<React> reactPage = reactRepository.findAllByPostId(postId, pageable);
-        var reactData = reactPage.getContent().stream().map(this::toReactResponse).toList();
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserProfileResponse userProfileResponse = userProfileClient.findById(userId).getData();
+        if(Objects.isNull(userProfileResponse)){
+            log.error(ErrorCode.UNCONNECTED_SERVICE.getMessage());
+        }
+        var reactData = reactPage.getContent().stream()
+                .map(react -> this.toReactResponse(react, userProfileResponse)).toList();
         return PageResponse.<ReactResponse>builder()
                 .currentPage(page)
                 .pageSize(size)
                 .totalPages(reactPage.getTotalPages())
                 .totalElements(reactPage.getTotalElements())
                 .result(reactData).build();
-    }
-
-    public boolean isReacted (String postId){
-        postRepository.findById(postId)
-                .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXISTED));
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-        return reactRepository.existsByPostIdAndOwnerId(postId, userId);
     }
 
     private String verify (String eventId, String userId){
@@ -122,9 +121,11 @@ public class ReactService {
         return eventResponse.getManagerId();
     }
 
-    private ReactResponse toReactResponse (React react){
+    private ReactResponse toReactResponse (React react, UserProfileResponse userProfileResponse){
         ReactResponse reactResponse = reactMapper.toReactResponse(react);
         reactResponse.setCreatedDate(dateTimeFormatter.format(react.getCreatedDate()));
+        reactResponse.setOwnerUsername(userProfileResponse.getUsername());
+        reactResponse.setOwnerAvatar(userProfileResponse.getAvatar());
         return reactResponse;
     }
 }
