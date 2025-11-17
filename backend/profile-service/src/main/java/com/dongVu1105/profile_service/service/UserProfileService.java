@@ -42,6 +42,10 @@ public class UserProfileService {
         return userProfileMapper.toUserProfileResponse(userProfileRepository.findByUserId(userId));
     }
 
+    public UserProfileResponse findByUsername (String username){
+        return userProfileMapper.toUserProfileResponse(userProfileRepository.findByUsername(username));
+    }
+
     public List<UserProfileResponse> findAllByUserIdList (GetProfileRequest request){
         return userProfileRepository.findAllByUserIdIn(request.getUserIdList())
                 .stream().map(userProfileMapper::toUserProfileResponse).toList();

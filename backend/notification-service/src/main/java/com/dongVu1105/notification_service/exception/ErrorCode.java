@@ -14,7 +14,8 @@ public enum ErrorCode {
     CAN_NOT_CREATE_TOKEN (1007, "cannot create token", HttpStatus.BAD_REQUEST),
     ROLE_NOT_EXISTED (1008, "role not existed", HttpStatus.NOT_FOUND),
     UNCONNECTED_SERVICE (1011, "service was not connected", HttpStatus.BAD_REQUEST),
-    RECEIVER_NOT_FOUND (1012, "receiver not found", HttpStatus.NOT_FOUND)
+    RECEIVER_NOT_FOUND (1012, "receiver not found", HttpStatus.NOT_FOUND),
+    NOTIFICATION_NOT_FOUND (1013, "this notification not found", HttpStatus.NOT_FOUND)
     ;
 
     private final int code;

@@ -22,4 +22,5 @@ public class Notification <T> {
     List<String> receiverId;
     T info;
     Instant createdDate;
+    boolean isRead;
 }

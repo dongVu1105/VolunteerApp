@@ -4,11 +4,15 @@ import com.dongVu1105.event_service.dto.ApiResponse;
 import com.dongVu1105.event_service.dto.request.EventUserCreationRequest;
 import com.dongVu1105.event_service.dto.response.*;
 import com.dongVu1105.event_service.service.EventUserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.apache.kafka.shaded.com.google.protobuf.Api;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EventUserController {
     EventUserService eventUserService;
+    ObjectMapper objectMapper;
 
     // Người dùng đăng kí tham gia sự kiện
     @PostMapping("/register")
@@ -105,6 +110,18 @@ public class EventUserController {
             @PathVariable("userId") String userId,
             @PathVariable("eventId") String eventId){
         return ApiResponse.<Boolean>builder().data(eventUserService.isInEvent(userId, eventId)).build();
+    }
+
+    @GetMapping(value = "/export/file", produces = "application/json")
+    public ResponseEntity<byte[]> exportEventsAsFile() throws Exception {
+
+        List<EventExportResponse> eventExportResponses = eventUserService.exportUserInEvents();
+
+        byte[] jsonBytes = objectMapper.writeValueAsBytes(eventExportResponses);
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=event-users.json")
+                .body(jsonBytes);
     }
 
 }

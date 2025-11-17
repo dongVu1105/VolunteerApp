@@ -7,9 +7,7 @@ import com.dongVu1105.notification_service.service.NotificationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,5 +21,11 @@ public class NotificationController {
             @RequestParam(value = "size", required = false, defaultValue = "10") int size){
         return ApiResponse.<PageResponse<NotificationResponse>>builder()
                 .data(notificationService.findAllByUserId( page, size)).build();
+    }
+
+    @PutMapping("/{notificationId}")
+    public ApiResponse<NotificationResponse> alreadyRead (@PathVariable("notificationId") String notificationId){
+        return ApiResponse.<NotificationResponse>builder()
+                .data(notificationService.alreadyRead(notificationId)).build();
     }
 }

@@ -29,7 +29,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -49,6 +48,7 @@ public class EventUserService {
     EventMapper eventMapper;
     DateTimeFormatter dateTimeFormatter;
 
+    @PreAuthorize("hasRole('USER')")
     public EventUserResponse eventRegistration (EventUserCreationRequest request){
         Event event = eventRepository.findById(request.getEventId())
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
@@ -83,6 +83,7 @@ public class EventUserService {
         return eventUserMapper.toEventUserResponse(newEventUser);
     }
 
+    @PreAuthorize("hasRole('USER')")
     public void unsubscribeEvent (String eventId){
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
@@ -103,6 +104,7 @@ public class EventUserService {
     }
 
     /// Cần hiện danh sách thông tin event
+    @PreAuthorize("hasRole('USER')")
     public PageResponse<EventResponse> findAllMyCompletedEventByUserId (int page, int size){
         Sort sort = Sort.by("id");
         Pageable pageable = PageRequest.of(page - 1, size, sort);
@@ -118,6 +120,8 @@ public class EventUserService {
                 .pageSize(eventUserPage.getSize())
                 .totalPages(eventUserPage.getTotalPages())
                 .totalElements(eventUserPage.getTotalElements())
+                .hasNextPage(eventUserPage.hasNext())
+                .hasPreviousPage(eventUserPage.hasPrevious())
                 .result(eventResponseList)
                 .build();
     }
@@ -156,10 +160,13 @@ public class EventUserService {
                 .pageSize(eventUserPage.getSize())
                 .totalPages(eventUserPage.getTotalPages())
                 .totalElements(eventUserPage.getTotalElements())
+                .hasPreviousPage(eventUserPage.hasPrevious())
+                .hasNextPage(eventUserPage.hasNext())
                 .result(eventUserInfoResponseList)
                 .build();
     }
 
+    @PreAuthorize("hasRole('USER')")
     public Boolean isInEvent (String userId, String eventId){
         String eventUserHash = this.hashEventUser(userId, eventId);
         EventUser eventUser = eventUserRepository.findByEventUserHash(eventUserHash);
@@ -260,6 +267,8 @@ public class EventUserService {
                 .pageSize(eventUserPage.getSize())
                 .totalPages(eventUserPage.getTotalPages())
                 .totalElements(eventUserPage.getTotalElements())
+                .hasPreviousPage(eventUserPage.hasPrevious())
+                .hasNextPage(eventUserPage.hasNext())
                 .result(eventUserInfoResponseList)
                 .build();
     }
@@ -322,8 +331,32 @@ public class EventUserService {
                 .pageSize(eventUserPage.getSize())
                 .totalPages(eventUserPage.getTotalPages())
                 .totalElements(eventUserPage.getTotalElements())
+                .hasPreviousPage(eventUserPage.hasPrevious())
+                .hasNextPage(eventUserPage.hasNext())
                 .result(eventUserInfoResponseList)
                 .build();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<EventExportResponse> exportUserInEvents (){
+        List<EventResponse> eventResponseList = eventRepository.findAll()
+                .stream().map(eventMapper::toEventResponse).toList();
+        List<EventExportResponse> eventExportResponses = new ArrayList<>();
+        eventResponseList.stream().forEach(eventResponse -> {
+            List<EventUser> eventUserList = eventUserRepository.findAllByEventId(eventResponse.getId());
+            List<String> userIdList = new ArrayList<>();
+            eventUserList.forEach(eventUser -> userIdList.add(eventUser.getUserId()));
+            GetProfileRequest getProfileRequest = GetProfileRequest.builder()
+                    .userIdList(userIdList).build();
+            List<UserProfileResponse> userProfilePage = userProfileClient.findAllByUserIdList(getProfileRequest).getData();
+            EventExportResponse eventExportResponse = EventExportResponse.builder()
+                    .eventResponse(eventResponse)
+                    .userProfileResponseList(userProfilePage)
+                    .build();
+            eventExportResponses.add(eventExportResponse);
+        });
+
+        return eventExportResponses;
     }
 
 

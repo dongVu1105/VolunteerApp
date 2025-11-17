@@ -14,7 +14,13 @@ public enum ErrorCode {
     UNABLE_ACCOUNT (1006, "account was unable!", HttpStatus.BAD_REQUEST),
     CAN_NOT_CREATE_TOKEN (1007, "cannot create token", HttpStatus.BAD_REQUEST),
     ROLE_NOT_EXISTED (1008, "role not existed", HttpStatus.NOT_FOUND),
-    FAIL_REGISTRATION (1009, "register fail!", HttpStatus.NOT_FOUND)
+    FAIL_REGISTRATION (1009, "register fail!", HttpStatus.NOT_FOUND),
+    INVALID_PASSWORD(1010, "Password must be at least {min} characters", HttpStatus.BAD_REQUEST),
+    INVALID_EMAIL(1011, "Invalid email address", HttpStatus.BAD_REQUEST),
+    EMAIL_IS_REQUIRED(1012, "Email is required", HttpStatus.BAD_REQUEST),
+    INVALID_KEY(1013, "invalid key error", HttpStatus.BAD_REQUEST),
+    INVALID_USERNAME(1014, "your username must be at least {min} characters", HttpStatus.BAD_REQUEST),
+    USERNAME_EXISTED(1015, "existed username", HttpStatus.BAD_REQUEST)
     ;
 
     private final int code;

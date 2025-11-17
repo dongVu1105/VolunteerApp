@@ -120,6 +120,7 @@ public class EventService {
         return event.isStatusEvent();
     }
 
+    @PreAuthorize("hasRole('USER')")
     public PageResponse<EventResponse> findAllByCategoryAndDate (int page, int size, String category, Instant fromDate, Instant toDate){
         Sort sort = Sort.by("createdDate").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
@@ -132,6 +133,8 @@ public class EventService {
                 .pageSize(eventPage.getSize())
                 .totalPages(eventPage.getTotalPages())
                 .totalElements(eventPage.getTotalElements())
+                .hasNextPage(eventPage.hasNext())
+                .hasPreviousPage(eventPage.hasPrevious())
                 .result(eventData)
                 .build();
     }
@@ -148,8 +151,14 @@ public class EventService {
                 .pageSize(eventPage.getSize())
                 .totalPages(eventPage.getTotalPages())
                 .totalElements(eventPage.getTotalElements())
+                .hasNextPage(eventPage.hasNext())
+                .hasPreviousPage(eventPage.hasPrevious())
                 .result(eventData)
                 .build();
+    }
+
+    public List<EventResponse> findAll (){
+        return eventRepository.findAll().stream().map(eventMapper::toEventResponse).toList();
     }
 
 

@@ -46,7 +46,7 @@ public class ApplicationInitConfig {
                         () -> new AppException(ErrorCode.ROLE_NOT_EXISTED)));
                 User user = User.builder()
                         .email("admin@gmail.com")
-                        .password(passwordEncoder.encode("admin"))
+                        .password(passwordEncoder.encode("admin12345"))
                         .role(roles)
                         .statusAccount(true)
                         .build();

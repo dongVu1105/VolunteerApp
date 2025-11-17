@@ -12,4 +12,5 @@ import java.util.List;
 public interface UserProfileRepository extends Neo4jRepository<UserProfile, String> {
     UserProfile findByUserId (String userId);
     List<UserProfile> findAllByUserIdIn (List<String> userId);
+    UserProfile findByUsername (String username);
 }

@@ -1,5 +1,6 @@
 package com.dongVu1105.event_service.exception;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -22,7 +23,12 @@ public enum ErrorCode {
     UNAVAILABLE_EVENT (1016, "event has not accepted by admin", HttpStatus.BAD_REQUEST),
     CANNOT_MODIFY_EVENT (1017, "Only the event manager can modify this event", HttpStatus.BAD_REQUEST),
     CANNOT_UNSUBSCRIBE_EVENT(1018, "Event is ongoing, you cannot unsubscribe", HttpStatus.BAD_REQUEST),
-    FINISHED_EVENT(1018, "Event finished", HttpStatus.BAD_REQUEST)
+    FINISHED_EVENT(1018, "Event finished", HttpStatus.BAD_REQUEST),
+    INVALID_STARTDATE(1019, "start date must be after now", HttpStatus.BAD_REQUEST),
+    INVALID_FINISHDATE(1020, "finish date must be after start date", HttpStatus.BAD_REQUEST),
+    INVALID_TITLE(1021, "event title must be at least {min} characters", HttpStatus.BAD_REQUEST),
+    INVALID_KEY(1022, "invalid key error", HttpStatus.BAD_REQUEST),
+    FIELD_REQUIRED(1023, "field required", HttpStatus.BAD_REQUEST)
     ;
 
     private final int code;

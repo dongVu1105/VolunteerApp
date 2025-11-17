@@ -26,8 +26,9 @@ public class InternalProfileController {
                 .data(userProfileService.create(request)).build();
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/user/{userId}")
     public ApiResponse<UserProfileResponse> findById (@PathVariable("userId") String userId){
+        System.out.println("Da vao internal profile controller");
         return ApiResponse.<UserProfileResponse>builder().data(userProfileService.findByUserId(userId)).build();
     }
 
@@ -35,5 +36,10 @@ public class InternalProfileController {
     public ApiResponse<List<UserProfileResponse>> findAllByUserIdList (@RequestBody GetProfileRequest request){
         return ApiResponse.<List<UserProfileResponse>>builder()
                 .data(userProfileService.findAllByUserIdList(request)).build();
+    }
+
+    @GetMapping("/find/{username}")
+    public ApiResponse<UserProfileResponse> findByUsername (@PathVariable("username") String username){
+        return ApiResponse.<UserProfileResponse>builder().data(userProfileService.findByUsername(username)).build();
     }
 }

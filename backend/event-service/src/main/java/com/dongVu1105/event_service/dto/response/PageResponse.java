@@ -16,6 +16,8 @@ public class PageResponse<T> {
     int totalPages;
     int pageSize;
     long totalElements;
+    boolean hasNextPage;
+    boolean hasPreviousPage;
 
     @Builder.Default
     private List<T> result = Collections.emptyList();
