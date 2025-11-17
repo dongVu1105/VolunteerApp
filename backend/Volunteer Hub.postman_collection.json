@@ -401,7 +401,7 @@
 				"auth": {
 					"type": "bearer",
 					"bearer": {
-						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxZGYyMDc0Mi1jMGYxLTQ4NDMtYmUzZS04MzFkZmMzNzZhMDEiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0FETUlOIiwiaXNzIjoidGVhbTE2LmNvbSIsImV4cCI6MTc2MjI1MzUzNCwiaWF0IjoxNzYyMjUyNTM0LCJqdGkiOiJmN2MyOWJmYS0wNGY1LTRiODctYTg0OS01ODRlMWE0ZWUyMzYifQ._ytTnGv5m7_wiCMpwnW9fGzOOWtJ5BT1op8OKTOKEemOG63hN5k_JVSHwZkh1Qd5g21K25na2M97tiTXZ8KbRw"
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2MTg3NjUwNi0zNWUyLTQyNDMtYmVmNC0wOGNiNDkxNjNiODkiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0VWRU5UX01BTkFHRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYzMzk1NzYzLCJpYXQiOjE3NjMzOTQ3NjMsImp0aSI6IjExOTEyZDJjLTI1MmQtNGM3Zi1hZTQwLTc3M2U1MTQ3ZDVjYiJ9.ldiUxL4rsPZwceJyla9Pxoq0E2HRlhzFHWCmcR9ARNm8URplK3qv-37z_Pb8XjRHsVJhsjO9-Nn-9MM4tJGfgA"
 					}
 				},
 				"method": "PUT",
@@ -411,7 +411,7 @@
 					"formdata": [
 						{
 							"key": "request",
-							"value": "{\n  \"id\" : \"69082f33c4dc4e1bec2d87b8\",\n  \"title\": \"Hội thảo Công nghệ AI 2028\",\n  \"location\": \"Hội trường A, Đại học C\",\n  \"description\": \"Sự kiện giới thiệu các xu hướng mới nhất trong lĩnh vực Trí tuệ Nhân tạo và Machine Learning.\",\n  \"startDate\": \"2025-10-15T08:00:00Z\",\n  \"finishDate\": \"2025-11-15T17:00:00Z\",\n  \"category\": \"Từ thiện\"\n}",
+							"value": "{\n  \"id\" : \"691b44e8f6d394405df06c61\",\n  \"title\": \"Hội thảo Công nghệ AI 2028\",\n  \"location\": \"Hội trường AB, Đại học C\",\n  \"description\": \"Sự kiện giới thiệu các xu hướng mới nhất trong lĩnh vực Trí tuệ Nhân tạo và Machine Learning.\",\n  \"startDate\": \"2025-10-15T08:00:00Z\",\n  \"finishDate\": \"2025-11-15T17:00:00Z\",\n  \"category\": \"Từ thiện\"\n}",
 							"type": "text"
 						},
 						{
@@ -421,7 +421,7 @@
 						}
 					]
 				},
-				"url": "http://localhost:8888/api/v1/event/update/"
+				"url": "http://localhost:8888/api/v1/event/update"
 			},
 			"response": []
 		},
@@ -606,7 +606,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"email\" : \"user7@gmail.com\",\r\n    \"password\" : \"123456789\"\r\n}",
+					"raw": "{\r\n    \"email\" : \"user26@gmail.com\",\r\n    \"password\" : \"123456789\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -642,7 +642,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"email\" : \"admin@gmail.com\",\r\n    \"password\" : \"admin\"\r\n}",
+					"raw": "{\r\n    \"email\" : \"admin@gmail.com\",\r\n    \"password\" : \"admin12345\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1155,12 +1155,65 @@
 				"auth": {
 					"type": "bearer",
 					"bearer": {
-						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1N2NlNTJlMi1lNzUyLTQyOWMtYmU0NC05YjYyNzJiODYyODQiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX1VTRVIiLCJpc3MiOiJ0ZWFtMTYuY29tIiwiZXhwIjoxNzYyODYyNTgzLCJpYXQiOjE3NjI4NjE1ODMsImp0aSI6ImEwODZjZDFmLTE3NDQtNDE3Mi1hM2JiLTk0NDYyMjlhMDNjZCJ9.Vq9S6bFterBo2okusFAp1sYARo4HnQgEfsstu59MEGtRCuSDHPSW8JpSTM9j4-mjRIgI8EAfN4p6SQ9hoHl5gg"
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5NWY5NGQ2Mi01OGIzLTRjNTktOTJiNi00MjIzYWE5ZGE4NzUiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0FETUlOIiwiaXNzIjoidGVhbTE2LmNvbSIsImV4cCI6MTc2MzM5OTE1MywiaWF0IjoxNzYzMzk4MTUzLCJqdGkiOiIxY2E5YzQ3Zi1iNTEzLTQ3ZjYtODhhOS0xNDk3NWEzYWE4MmYifQ.wE5ol3s5e619qBP-DMGZVp31cAxQaKj6cX9GZY1idtGBd0CNdGH1OA3nYqm8pGecdLDndhguSN7NljCt_v_mBw"
 					}
 				},
 				"method": "GET",
 				"header": [],
 				"url": "http://localhost:8888/api/v1/event/categories"
+			},
+			"response": []
+		},
+		{
+			"name": "mark as read (notification)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5NWY5NGQ2Mi01OGIzLTRjNTktOTJiNi00MjIzYWE5ZGE4NzUiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0FETUlOIiwiaXNzIjoidGVhbTE2LmNvbSIsImV4cCI6MTc2MzM5MjMyMCwiaWF0IjoxNzYzMzkxMzIwLCJqdGkiOiJhZDE3Y2U4Yi00MzM0LTQ2N2ItYmVjOS01ZDViYjMyOWYzYTAifQ.S4Hw0iO1bVwtUqO4oahcNVA6u3bUId1IOtv5li5auX-3eTdOdIWLjae7q4KzHnGJkgRVRXQy_Z7SHu7tG0cF-A"
+					}
+				},
+				"method": "PUT",
+				"header": [],
+				"url": "http://localhost:8888/api/v1/notification/691b35c4397485746634adb6"
+			},
+			"response": []
+		},
+		{
+			"name": "search account",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5NWY5NGQ2Mi01OGIzLTRjNTktOTJiNi00MjIzYWE5ZGE4NzUiLCJ0b2tlbi10eXBlIjoiYWNjZXNzIiwic2NvcGUiOiJST0xFX0FETUlOIiwiaXNzIjoidGVhbTE2LmNvbSIsImV4cCI6MTc2MzM5NjMzMCwiaWF0IjoxNzYzMzk1MzMwLCJqdGkiOiIyOTY3MDA4MS00NjhmLTQ2MmYtYmYzYy1lNjVhY2VjNmFiODAifQ.hMOa-63jWiqJiQ4pJL9zCvKHpxgctizutOKUt2a6BgjSj3KeN8LJ8O0ix2QKcNKIQSr-fX_pCPjhU1AQKYKqFQ"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "page",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "size",
+							"value": "5",
+							"type": "text"
+						},
+						{
+							"key": "keyword",
+							"value": "user2",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://localhost:8888/api/v1/identity/user/search"
 			},
 			"response": []
 		}
