@@ -51,7 +51,9 @@ public class UserService {
         user.setStatusAccount(true);
         Set<Role> roles = new HashSet<>(roleRepository.findAllById(request.getRole()));
         user.setRole(roles);
-
+        if(Objects.nonNull(userProfileClient.findByUsername(request.getUsername()).getData())){
+            throw new AppException(ErrorCode.USERNAME_EXISTED);
+        }
         try {
             user = userRepository.save(user);
         } catch (DataIntegrityViolationException exception){
@@ -128,6 +130,24 @@ public class UserService {
                 .pageSize(userPage.getSize())
                 .totalPages(userPage.getTotalPages())
                 .totalElements(userPage.getTotalElements())
+                .hasPreviousPage(userPage.hasPrevious())
+                .hasNextPage(userPage.hasNext())
+                .result(userData)
+                .build();
+    }
+
+    public PageResponse<AccountResponse> findAccountByKeyword (int page, int size, String keyword){
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<User> userPage = userRepository.findAllByEmailContaining(keyword, pageable);
+        var userData = userPage.getContent().stream().map(userMapper::toAccountResponse).toList();
+
+        return PageResponse.<AccountResponse>builder()
+                .currentPage(page)
+                .pageSize(userPage.getSize())
+                .totalPages(userPage.getTotalPages())
+                .totalElements(userPage.getTotalElements())
+                .hasPreviousPage(userPage.hasPrevious())
+                .hasNextPage(userPage.hasNext())
                 .result(userData)
                 .build();
     }

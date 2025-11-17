@@ -7,6 +7,7 @@ import com.dongVu1105.identity_service.dto.response.PageResponse;
 import com.dongVu1105.identity_service.dto.response.RoleResponse;
 import com.dongVu1105.identity_service.dto.response.UserResponse;
 import com.dongVu1105.identity_service.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,7 +25,7 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/register")
-    public ApiResponse<UserResponse> register (@RequestBody UserCreationRequest request){
+    public ApiResponse<UserResponse> register (@Valid @RequestBody UserCreationRequest request){
         return ApiResponse.<UserResponse>builder().data(userService.create(request)).build();
     }
 
@@ -59,5 +60,14 @@ public class UserController {
             @RequestParam(value = "size", required = false, defaultValue = "10") int size){
         return ApiResponse.<PageResponse<AccountResponse>>builder()
                 .data(userService.findAllAccount(page, size)).build();
+    }
+
+    @GetMapping("/search")
+    public ApiResponse<PageResponse<AccountResponse>> findAllAccountByKeyword (
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size,
+            @RequestParam(value = "keyword") String keyword){
+        return ApiResponse.<PageResponse<AccountResponse>>builder()
+                .data(userService.findAccountByKeyword(page, size, keyword)).build();
     }
 }

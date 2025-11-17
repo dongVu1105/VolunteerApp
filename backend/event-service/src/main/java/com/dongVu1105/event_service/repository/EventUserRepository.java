@@ -7,11 +7,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface EventUserRepository extends MongoRepository<EventUser, String> {
     EventUser findByEventUserHash (String eventUserHash);
     Page<EventUser> findAllByStatusAndUserId (String status, String userId, Pageable pageable);
     Page<EventUser> findAllByEventId (String eventId, Pageable pageable);
     Page<EventUser> findAllByStatusAndEventId (String status, String eventId, Pageable pageable);
-    Boolean existsByUserIdAndEventId (String userId, String eventId);
+    List<EventUser> findAllByEventId (String eventId);
 }

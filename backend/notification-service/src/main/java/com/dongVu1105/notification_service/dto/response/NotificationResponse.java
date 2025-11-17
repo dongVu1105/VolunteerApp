@@ -20,4 +20,5 @@ public class NotificationResponse<T> {
     List<String> receiverId;
     T info;
     String createdDate;
+    boolean isRead;
 }

@@ -123,6 +123,8 @@ public class CommentService {
                 .pageSize(size)
                 .totalPages(commentPage.getTotalPages())
                 .totalElements(commentPage.getTotalElements())
+                .hasNextPage(commentPage.hasNext())
+                .hasPreviousPage(commentPage.hasPrevious())
                 .result(commentData).build();
     }
 

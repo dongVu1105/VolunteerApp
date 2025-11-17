@@ -9,6 +9,7 @@ import com.dongVu1105.identity_service.dto.response.AuthenticationResponse;
 import com.dongVu1105.identity_service.dto.response.IntrospectResponse;
 import com.dongVu1105.identity_service.service.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -29,7 +30,7 @@ public class AuthenticationController {
     AuthenticationService authenticationService;
 
     @PostMapping("/login")
-    public ApiResponse<AuthenticationResponse> login (@RequestBody AuthenticationRequest request){
+    public ApiResponse<AuthenticationResponse> login (@Valid @RequestBody AuthenticationRequest request){
         return ApiResponse.<AuthenticationResponse>builder()
                 .data(authenticationService.authenticate(request)).build();
     }

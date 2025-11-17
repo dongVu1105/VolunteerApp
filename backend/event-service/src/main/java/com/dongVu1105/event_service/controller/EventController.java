@@ -8,14 +8,16 @@ import com.dongVu1105.event_service.dto.response.PageResponse;
 import com.dongVu1105.event_service.service.EventService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.apache.kafka.shaded.com.google.protobuf.Api;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,13 +25,16 @@ import java.time.Instant;
 public class EventController {
     EventService eventService;
     ObjectMapper objectMapper;
+    RequestValidator requestValidator;
 
     // Quản lí sự kiện tạo event
     @PostMapping("/create")
     public ApiResponse<EventResponse> create (
+            @Valid
             @RequestPart(value = "request") String requestJson,
             @RequestPart(value = "file", required = false)MultipartFile file) throws JsonProcessingException {
         EventCreationRequest request = objectMapper.readValue(requestJson, EventCreationRequest.class);
+        requestValidator.validate(request);
         return ApiResponse.<EventResponse>builder().data(eventService.create(request, file)).build();
     }
 
@@ -39,6 +44,7 @@ public class EventController {
             @RequestPart(value = "request") String requestJson,
             @RequestPart(value = "file", required = false) MultipartFile file) throws JsonProcessingException {
         EventUpdationRequest request = objectMapper.readValue(requestJson, EventUpdationRequest.class);
+        requestValidator.validate(request);
         return ApiResponse.<EventResponse>builder().data(eventService.update(request, file)).build();
     }
 
@@ -86,6 +92,8 @@ public class EventController {
         eventService.delete(eventId);
         return ApiResponse.<Void>builder().build();
     }
+
+
 
 
 }

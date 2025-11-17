@@ -9,7 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
       </profile>
-      <profile name="Annotation profile for post-service" enabled="true">
+      <profile name="Annotation profile for identity-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -25,8 +25,8 @@
         <module name="post-service" />
         <module name="profile-service" />
         <module name="identity-service" />
-        <module name="file-service" />
         <module name="event-service" />
+        <module name="file-service" />
         <module name="notification-service" />
       </profile>
     </annotationProcessing>

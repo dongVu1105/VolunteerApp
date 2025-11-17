@@ -106,6 +106,8 @@ public class ReactService {
                 .pageSize(size)
                 .totalPages(reactPage.getTotalPages())
                 .totalElements(reactPage.getTotalElements())
+                .hasPreviousPage(reactPage.hasPrevious())
+                .hasNextPage(reactPage.hasNext())
                 .result(reactData).build();
     }
 

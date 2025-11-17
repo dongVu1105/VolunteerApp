@@ -52,6 +52,7 @@ public class NotificationService {
                 .info(EventInfo.builder().eventId(eventNoti.getEventId()).build())
                 .receiverId(List.of(eventNoti.getReceiverId()))
                 .createdDate(Instant.now())
+                .isRead(false)
                 .build();
         Notification<EventInfo> finalNotification = notificationRepository.save(notification);
         WebSocketSession webSocketSession = webSocketSessionRepository.findByUserId(
@@ -78,6 +79,7 @@ public class NotificationService {
                 .message(predefinedNotification.getContent() + eventNoti.getEventTitle())
                 .info(EventInfo.builder().eventId(eventNoti.getEventId()).build())
                 .receiverId(List.of(eventNoti.getReceiverId()))
+                .isRead(false)
                 .createdDate(Instant.now())
                 .build();
         Notification<EventInfo> finalNotification = notificationRepository.save(notification);
@@ -106,6 +108,7 @@ public class NotificationService {
                 .info(EventInfo.builder().eventId(eventNoti.getEventId()).build())
                 .receiverId(List.of(eventNoti.getReceiverId()))
                 .createdDate(Instant.now())
+                .isRead(false)
                 .build();
         Notification<EventInfo> finalNotification = notificationRepository.save(notification);
         WebSocketSession webSocketSession = webSocketSessionRepository.findByUserId(
@@ -133,6 +136,7 @@ public class NotificationService {
                 .info(EventUserInfo.builder().eventUserId(eventUserNoti.getEventUserId()).build())
                 .receiverId(List.of(eventUserNoti.getReceiverId()))
                 .createdDate(Instant.now())
+                .isRead(false)
                 .build();
         Notification<EventUserInfo> finalNotification = notificationRepository.save(notification);
         WebSocketSession webSocketSession = webSocketSessionRepository.findByUserId(
@@ -161,6 +165,7 @@ public class NotificationService {
                 .info(eventResponse)
                 .receiverId(List.of(eventResponse.getManagerId()))
                 .createdDate(Instant.now())
+                .isRead(false)
                 .build();
         Notification<EventResponse> finalNotification = notificationRepository.save(notification);
         WebSocketSession webSocketSession = webSocketSessionRepository.findByUserId(
@@ -188,6 +193,7 @@ public class NotificationService {
                 .info(postNoti)
                 .receiverId(postNoti.getReceiverId())
                 .createdDate(Instant.now())
+                .isRead(false)
                 .build();
         Notification<PostNoti> finalNotification = notificationRepository.save(notification);
         System.out.println("finalNotification.getReceiverId(): "+ finalNotification.getReceiverId());
@@ -230,7 +236,16 @@ public class NotificationService {
                 .pageSize(notificationPage.getSize())
                 .totalElements(notificationPage.getTotalElements())
                 .totalPages(notificationPage.getTotalPages())
+                .hasPreviousPage(notificationPage.hasPrevious())
+                .hasNextPage(notificationPage.hasNext())
                 .result(notiData).build();
+    }
+
+    public NotificationResponse alreadyRead (String notificationId){
+        Notification notification = notificationRepository.findById(notificationId).orElseThrow(
+                () -> new AppException(ErrorCode.NOTIFICATION_NOT_FOUND));
+        notification.setRead(true);
+        return notificationMapper.toNotificationResponse(notificationRepository.save(notification));
     }
 
     private NotificationResponse toNotificationResponse (Notification notification){

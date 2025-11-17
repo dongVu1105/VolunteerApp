@@ -124,6 +124,8 @@ public class PostService {
                 .pageSize(size)
                 .totalPages(postPage.getTotalPages())
                 .totalElements(postPage.getTotalElements())
+                .hasPreviousPage(postPage.hasPrevious())
+                .hasNextPage(postPage.hasNext())
                 .result(postData).build();
     }
 
