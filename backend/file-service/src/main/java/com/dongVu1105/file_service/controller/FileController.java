@@ -22,6 +22,7 @@ import java.io.IOException;
 public class FileController {
     FileService fileService;
 
+    // Lấy file ảnh
     @GetMapping("/download/{fileName}")
     ResponseEntity<Resource> download(@PathVariable String fileName) throws IOException {
         FileData fileData = fileService.download(fileName);

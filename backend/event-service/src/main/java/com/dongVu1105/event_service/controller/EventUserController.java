@@ -112,6 +112,7 @@ public class EventUserController {
         return ApiResponse.<Boolean>builder().data(eventUserService.isInEvent(userId, eventId)).build();
     }
 
+    // Xuất file danh sách sự kiện/tình nguyện viên
     @GetMapping(value = "/export/file", produces = "application/json")
     public ResponseEntity<byte[]> exportEventsAsFile() throws Exception {
 

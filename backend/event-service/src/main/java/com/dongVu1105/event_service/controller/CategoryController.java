@@ -18,6 +18,7 @@ import java.util.List;
 public class CategoryController {
     CategoryService categoryService;
 
+    // Lấy danh sách danh mục
     @GetMapping("/categories")
     public ApiResponse<List<CategoryResponse>> findAll (){
         return ApiResponse.<List<CategoryResponse>>builder().data(categoryService.findAll()).build();

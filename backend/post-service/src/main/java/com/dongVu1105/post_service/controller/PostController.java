@@ -22,6 +22,7 @@ public class PostController {
     PostService postService;
     ObjectMapper objectMapper;
 
+    // Tạo bài viết trong sự kiện
     @PostMapping("/create")
     public ApiResponse<PostResponse> create (
             @RequestPart(value = "request") String requestJson,
@@ -30,12 +31,14 @@ public class PostController {
         return ApiResponse.<PostResponse>builder().data(postService.create(file, request)).build();
     }
 
+    // Xóa 1 bài viết trong sự kiện
     @DeleteMapping("/delete/{postId}")
     public ApiResponse<Void> delete (@PathVariable("postId") String postId){
         postService.delete(postId);
         return ApiResponse.<Void>builder().build();
     }
 
+    // Tìm tất cả bài viết trong sự kiện
     @GetMapping("/find-all")
     public ApiResponse<PageResponse<PostResponse>> findAllByEventId (
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
@@ -45,6 +48,7 @@ public class PostController {
                 .data(postService.findAllByEventId(page, size, eventId)).build();
     }
 
+    // Tìm bài viết theo id
     @GetMapping("/{id}")
     public ApiResponse<PostResponse> findById (@PathVariable("id") String id){
         return ApiResponse.<PostResponse>builder().data(postService.findById(id)).build();

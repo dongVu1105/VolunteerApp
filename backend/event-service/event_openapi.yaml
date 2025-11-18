@@ -1,0 +1,941 @@
+openapi: 3.0.3
+info:
+  title: Event Service API
+  description: API quản lý sự kiện và người dùng tham gia sự kiện trong hệ thống VolunteerHub
+  version: 1.0.0
+  contact:
+    name: DongVu1105
+    email: admin@gmail.com
+
+servers:
+  - url: http://localhost:8084/event
+    description: Development server
+
+tags:
+  - name: Event Management
+    description: Các endpoint quản lý sự kiện
+  - name: Category
+    description: Các endpoint quản lý danh mục sự kiện
+  - name: Event User
+    description: Các endpoint quản lý người dùng tham gia sự kiện
+
+paths:
+  /create:
+    post:
+      tags:
+        - Event Management
+      summary: Tạo sự kiện mới
+      description: Endpoint cho phép quản lý sự kiện tạo một sự kiện mới với thông tin chi tiết và hình ảnh (tùy chọn)
+      operationId: createEvent
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - request
+              properties:
+                request:
+                  type: string
+                  description: JSON string chứa thông tin sự kiện
+                  example: '{"title":"Sự kiện từ thiện","location":"Hà Nội","description":"Mô tả sự kiện","startDate":"2025-12-01T08:00:00Z","finishDate":"2025-12-02T17:00:00Z","category":"Từ thiện"}'
+                file:
+                  type: string
+                  format: binary
+                  description: File hình ảnh sự kiện (tùy chọn)
+      responses:
+        '200':
+          description: Tạo sự kiện thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseEventResponse'
+
+  /update:
+    put:
+      tags:
+        - Event Management
+      summary: Cập nhật sự kiện
+      description: Endpoint cho phép quản lý sự kiện sửa đổi thông tin của một sự kiện đã tồn tại
+      operationId: updateEvent
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - request
+              properties:
+                request:
+                  type: string
+                  description: JSON string chứa thông tin cập nhật sự kiện
+                  example: '{"id":"event123","title":"Sự kiện từ thiện cập nhật","location":"Hà Nội","description":"Mô tả mới","startDate":"2025-12-01T08:00:00Z","finishDate":"2025-12-02T17:00:00Z","category":"Từ thiện"}'
+                file:
+                  type: string
+                  format: binary
+                  description: File hình ảnh sự kiện mới (tùy chọn)
+      responses:
+        '200':
+          description: Cập nhật sự kiện thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseEventResponse'
+
+  /category-date:
+    get:
+      tags:
+        - Event Management
+      summary: Lọc sự kiện theo danh mục và ngày
+      description: Endpoint cho phép người dùng tìm kiếm và lọc sự kiện theo danh mục và khoảng thời gian
+      operationId: findEventsByCategoryAndDate
+      parameters:
+        - name: page
+          in: query
+          description: Số trang (bắt đầu từ 1)
+          schema:
+            type: integer
+            default: 1
+        - name: size
+          in: query
+          description: Số lượng sự kiện trên mỗi trang
+          schema:
+            type: integer
+            default: 10
+        - name: category
+          in: query
+          description: Danh mục sự kiện
+          schema:
+            type: string
+            default: Từ thiện
+        - name: fromDate
+          in: query
+          description: Ngày bắt đầu lọc
+          schema:
+            type: string
+            format: date-time
+            default: '2000-01-01T08:00:00Z'
+        - name: toDate
+          in: query
+          description: Ngày kết thúc lọc
+          schema:
+            type: string
+            format: date-time
+            default: '2100-01-01T08:00:00Z'
+      responses:
+        '200':
+          description: Lấy danh sách sự kiện thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponsePageEventResponse'
+
+  /{eventId}:
+    get:
+      tags:
+        - Event Management
+      summary: Tìm sự kiện theo ID
+      description: Endpoint cho phép tìm kiếm thông tin chi tiết của một sự kiện dựa trên ID
+      operationId: findEventById
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          description: ID của sự kiện
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lấy thông tin sự kiện thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseEventResponse'
+
+  /status/{eventId}:
+    get:
+      tags:
+        - Event Management
+      summary: Kiểm tra trạng thái duyệt sự kiện
+      description: Endpoint kiểm tra xem sự kiện đã được admin duyệt chưa để có thể đăng bài
+      operationId: checkEventStatus
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          description: ID của sự kiện
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lấy trạng thái sự kiện thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseBoolean'
+
+  /pending:
+    get:
+      tags:
+        - Event Management
+      summary: Tìm các sự kiện chưa được chấp nhận
+      description: Endpoint cho admin tìm các sự kiện đang chờ duyệt
+      operationId: findPendingEvents
+      parameters:
+        - name: page
+          in: query
+          description: Số trang (bắt đầu từ 1)
+          schema:
+            type: integer
+            default: 1
+        - name: size
+          in: query
+          description: Số lượng sự kiện trên mỗi trang
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Lấy danh sách sự kiện chờ duyệt thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponsePageEventResponse'
+
+  /accept/{eventId}:
+    put:
+      tags:
+        - Event Management
+      summary: Chấp nhận sự kiện
+      description: Endpoint cho phép admin chấp nhận và duyệt một sự kiện
+      operationId: acceptEvent
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          description: ID của sự kiện cần chấp nhận
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Chấp nhận sự kiện thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseEventResponse'
+
+  /delete/{eventId}:
+    delete:
+      tags:
+        - Event Management
+      summary: Xóa sự kiện
+      description: Endpoint cho phép admin xóa một sự kiện
+      operationId: deleteEvent
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          description: ID của sự kiện cần xóa
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Xóa sự kiện thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseVoid'
+
+  /categories:
+    get:
+      tags:
+        - Category
+      summary: Lấy danh sách danh mục
+      description: Endpoint lấy tất cả các danh mục sự kiện có sẵn trong hệ thống
+      operationId: getAllCategories
+      responses:
+        '200':
+          description: Lấy danh sách danh mục thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseListCategoryResponse'
+
+  /user/register:
+    post:
+      tags:
+        - Event User
+      summary: Đăng ký tham gia sự kiện
+      description: Endpoint cho phép người dùng đăng ký tham gia một sự kiện
+      operationId: registerEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventUserCreationRequest'
+      responses:
+        '200':
+          description: Đăng ký tham gia sự kiện thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseEventUserResponse'
+
+  /user/unsubscribe/{eventId}:
+    delete:
+      tags:
+        - Event User
+      summary: Hủy đăng ký sự kiện
+      description: Endpoint cho phép người dùng hủy đăng ký tham gia sự kiện
+      operationId: unsubscribeEvent
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          description: ID của sự kiện cần hủy đăng ký
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Hủy đăng ký sự kiện thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseVoid'
+
+  /user/completed-event:
+    get:
+      tags:
+        - Event User
+      summary: Xem các sự kiện đã hoàn thành
+      description: Endpoint cho phép người dùng xem danh sách các sự kiện mà họ đã được đánh dấu hoàn thành
+      operationId: getCompletedEvents
+      parameters:
+        - name: page
+          in: query
+          description: Số trang (bắt đầu từ 1)
+          schema:
+            type: integer
+            default: 1
+        - name: size
+          in: query
+          description: Số lượng sự kiện trên mỗi trang
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Lấy danh sách sự kiện đã hoàn thành thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponsePageEventResponse'
+
+  /user/pending:
+    get:
+      tags:
+        - Event User
+      summary: Xem người dùng chờ xác nhận
+      description: Endpoint cho phép quản lý sự kiện xem danh sách người dùng đăng ký nhưng chưa được xác nhận tham gia
+      operationId: getPendingUsers
+      parameters:
+        - name: page
+          in: query
+          description: Số trang (bắt đầu từ 1)
+          schema:
+            type: integer
+            default: 1
+        - name: size
+          in: query
+          description: Số lượng người dùng trên mỗi trang
+          schema:
+            type: integer
+            default: 10
+        - name: eventId
+          in: query
+          required: true
+          description: ID của sự kiện
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lấy danh sách người dùng chờ xác nhận thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponsePageEventUserInfoResponse'
+
+  /user/accept-registration/{eventUserId}:
+    put:
+      tags:
+        - Event User
+      summary: Xác nhận đăng ký của người dùng
+      description: Endpoint cho phép quản lý sự kiện xác nhận đăng ký tham gia của người dùng
+      operationId: acceptUserRegistration
+      parameters:
+        - name: eventUserId
+          in: path
+          required: true
+          description: ID của đăng ký sự kiện (EventUser ID)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Xác nhận đăng ký thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseEventUserResponse'
+
+  /user/reject-registration/{eventUserId}:
+    delete:
+      tags:
+        - Event User
+      summary: Từ chối đăng ký của người dùng
+      description: Endpoint cho phép quản lý sự kiện từ chối đăng ký tham gia của người dùng
+      operationId: rejectUserRegistration
+      parameters:
+        - name: eventUserId
+          in: path
+          required: true
+          description: ID của đăng ký sự kiện (EventUser ID)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Từ chối đăng ký thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseVoid'
+
+  /user/{eventUserId}:
+    get:
+      tags:
+        - Event User
+      summary: Tìm thông tin EventUser theo ID
+      description: Endpoint cho phép quản lý sự kiện tìm thông tin chi tiết của một đăng ký sự kiện
+      operationId: findEventUserById
+      parameters:
+        - name: eventUserId
+          in: path
+          required: true
+          description: ID của đăng ký sự kiện (EventUser ID)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lấy thông tin EventUser thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseEventUserResponse'
+
+  /user/confirm-completion/{eventUserId}:
+    put:
+      tags:
+        - Event User
+      summary: Xác nhận hoàn thành sự kiện
+      description: Endpoint cho phép quản lý sự kiện xác nhận người dùng đã hoàn thành sự kiện
+      operationId: confirmUserCompletion
+      parameters:
+        - name: eventUserId
+          in: path
+          required: true
+          description: ID của đăng ký sự kiện (EventUser ID)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Xác nhận hoàn thành thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseEventUserResponse'
+
+  /user/attending:
+    get:
+      tags:
+        - Event User
+      summary: Xem người dùng đang tham gia
+      description: Endpoint cho phép quản lý sự kiện xem danh sách người dùng đang tham gia sự kiện
+      operationId: getAttendingUsers
+      parameters:
+        - name: page
+          in: query
+          description: Số trang (bắt đầu từ 1)
+          schema:
+            type: integer
+            default: 1
+        - name: size
+          in: query
+          description: Số lượng người dùng trên mỗi trang
+          schema:
+            type: integer
+            default: 10
+        - name: eventId
+          in: query
+          required: true
+          description: ID của sự kiện
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lấy danh sách người dùng đang tham gia thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponsePageEventUserInfoResponse'
+
+  /user/find-all:
+    get:
+      tags:
+        - Event User
+      summary: Xem tất cả người dùng trong sự kiện
+      description: Endpoint cho phép quản lý sự kiện xem danh sách tất cả người dùng trong sự kiện (bao gồm tất cả trạng thái)
+      operationId: getAllUsersInEvent
+      parameters:
+        - name: page
+          in: query
+          description: Số trang (bắt đầu từ 1)
+          schema:
+            type: integer
+            default: 1
+        - name: size
+          in: query
+          description: Số lượng người dùng trên mỗi trang
+          schema:
+            type: integer
+            default: 10
+        - name: eventId
+          in: query
+          required: true
+          description: ID của sự kiện
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lấy danh sách tất cả người dùng thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponsePageEventUserInfoResponse'
+
+  /user/exist/{userId}/{eventId}:
+    get:
+      tags:
+        - Event User
+      summary: Kiểm tra người dùng có trong sự kiện
+      description: Endpoint kiểm tra xem một người dùng có đăng ký tham gia sự kiện hay không
+      operationId: checkUserInEvent
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ID của người dùng
+          schema:
+            type: string
+        - name: eventId
+          in: path
+          required: true
+          description: ID của sự kiện
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Kiểm tra thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseBoolean'
+
+  /user/export/file:
+    get:
+      tags:
+        - Event User
+      summary: Xuất file danh sách sự kiện và tình nguyện viên
+      description: Endpoint xuất file JSON chứa danh sách sự kiện và thông tin tình nguyện viên tham gia
+      operationId: exportEventUsers
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Xuất file thành công
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventExportResponse'
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+                example: 'attachment; filename=event-users.json'
+
+components:
+  schemas:
+    ApiResponseEventResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          default: 0
+        message:
+          type: string
+          default: success!
+        data:
+          $ref: '#/components/schemas/EventResponse'
+
+    ApiResponsePageEventResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          default: 0
+        message:
+          type: string
+          default: success!
+        data:
+          allOf:
+            - $ref: '#/components/schemas/PageResponse'
+            - type: object
+              properties:
+                result:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/EventResponse'
+
+    ApiResponseBoolean:
+      type: object
+      properties:
+        code:
+          type: integer
+          default: 0
+        message:
+          type: string
+          default: success!
+        data:
+          type: boolean
+
+    ApiResponseVoid:
+      type: object
+      properties:
+        code:
+          type: integer
+          default: 0
+        message:
+          type: string
+          default: success!
+        data:
+          type: object
+          nullable: true
+
+    ApiResponseListCategoryResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          default: 0
+        message:
+          type: string
+          default: success!
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryResponse'
+
+    ApiResponseEventUserResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          default: 0
+        message:
+          type: string
+          default: success!
+        data:
+          $ref: '#/components/schemas/EventUserResponse'
+
+    ApiResponsePageEventUserInfoResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          default: 0
+        message:
+          type: string
+          default: success!
+        data:
+          allOf:
+            - $ref: '#/components/schemas/PageResponse'
+            - type: object
+              properties:
+                result:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/EventUserInfoResponse'
+
+    EventResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID của sự kiện
+        title:
+          type: string
+          description: Tiêu đề sự kiện
+        location:
+          type: string
+          description: Địa điểm tổ chức sự kiện
+        description:
+          type: string
+          description: Mô tả chi tiết về sự kiện
+        startDate:
+          type: string
+          format: date-time
+          description: Ngày giờ bắt đầu sự kiện
+        finishDate:
+          type: string
+          format: date-time
+          description: Ngày giờ kết thúc sự kiện
+        category:
+          type: string
+          description: Danh mục sự kiện
+        managerId:
+          type: string
+          description: ID của người quản lý sự kiện
+        managerUsername:
+          type: string
+          description: Tên đăng nhập của người quản lý sự kiện
+        createdDate:
+          type: string
+          description: Ngày tạo sự kiện
+        image:
+          type: string
+          description: URL hình ảnh sự kiện
+        statusEvent:
+          type: boolean
+          description: Trạng thái duyệt của sự kiện
+
+    EventCreationRequest:
+      type: object
+      required:
+        - title
+        - location
+        - description
+        - startDate
+        - finishDate
+        - category
+      properties:
+        title:
+          type: string
+          minLength: 5
+          description: Tiêu đề sự kiện (tối thiểu 5 ký tự)
+        location:
+          type: string
+          description: Địa điểm tổ chức sự kiện
+        description:
+          type: string
+          description: Mô tả chi tiết về sự kiện
+        startDate:
+          type: string
+          format: date-time
+          description: Ngày giờ bắt đầu sự kiện
+        finishDate:
+          type: string
+          format: date-time
+          description: Ngày giờ kết thúc sự kiện
+        category:
+          type: string
+          description: Danh mục sự kiện
+
+    EventUpdationRequest:
+      type: object
+      required:
+        - location
+        - description
+        - startDate
+        - finishDate
+        - category
+      properties:
+        id:
+          type: string
+          description: ID của sự kiện cần cập nhật
+        title:
+          type: string
+          minLength: 5
+          description: Tiêu đề sự kiện (tối thiểu 5 ký tự)
+        location:
+          type: string
+          description: Địa điểm tổ chức sự kiện
+        description:
+          type: string
+          description: Mô tả chi tiết về sự kiện
+        startDate:
+          type: string
+          format: date-time
+          description: Ngày giờ bắt đầu sự kiện
+        finishDate:
+          type: string
+          format: date-time
+          description: Ngày giờ kết thúc sự kiện
+        category:
+          type: string
+          description: Danh mục sự kiện
+
+    CategoryResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Tên danh mục
+
+    EventUserCreationRequest:
+      type: object
+      properties:
+        eventId:
+          type: string
+          description: ID của sự kiện muốn đăng ký
+
+    EventUserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID của bản ghi EventUser
+        eventUserHash:
+          type: string
+          description: Mã hash của EventUser
+        userId:
+          type: string
+          description: ID/Username của người dùng
+        eventId:
+          type: string
+          description: ID/Title của sự kiện
+        status:
+          type: string
+          description: Trạng thái đăng ký (PENDING, ATTENDING, COMPLETED)
+
+    EventUserInfoResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID của bản ghi EventUser
+        userId:
+          type: string
+          description: ID của người dùng
+        username:
+          type: string
+          description: Tên đăng nhập
+        firstName:
+          type: string
+          description: Họ
+        lastName:
+          type: string
+          description: Tên
+        phoneNumber:
+          type: string
+          description: Số điện thoại
+        birthday:
+          type: string
+          format: date
+          description: Ngày sinh
+        identityNumber:
+          type: string
+          description: Số CMND/CCCD
+        gender:
+          type: boolean
+          description: Giới tính (true = Nam, false = Nữ)
+        avatar:
+          type: string
+          description: URL avatar
+        status:
+          type: string
+          description: Trạng thái trong sự kiện
+
+    UserProfileResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID hồ sơ
+        userId:
+          type: string
+          description: ID người dùng
+        username:
+          type: string
+          description: Tên đăng nhập
+        firstName:
+          type: string
+          description: Họ
+        lastName:
+          type: string
+          description: Tên
+        phoneNumber:
+          type: string
+          description: Số điện thoại
+        birthday:
+          type: string
+          format: date
+          description: Ngày sinh
+        identityNumber:
+          type: string
+          description: Số CMND/CCCD
+        gender:
+          type: boolean
+          description: Giới tính
+        avatar:
+          type: string
+          description: URL avatar
+
+    EventExportResponse:
+      type: object
+      properties:
+        eventResponse:
+          $ref: '#/components/schemas/EventResponse'
+        userProfileResponseList:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserProfileResponse'
+
+    PageResponse:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+          description: Trang hiện tại
+        totalPages:
+          type: integer
+          description: Tổng số trang
+        pageSize:
+          type: integer
+          description: Số lượng phần tử trên mỗi trang
+        totalElements:
+          type: integer
+          format: int64
+          description: Tổng số phần tử
+        hasNextPage:
+          type: boolean
+          description: Có trang tiếp theo hay không
+        hasPreviousPage:
+          type: boolean
+          description: Có trang trước đó hay không
+        result:
+          type: array
+          items:
+            type: object
+          description: Danh sách kết quả
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []

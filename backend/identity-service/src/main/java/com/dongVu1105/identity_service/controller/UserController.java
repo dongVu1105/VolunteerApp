@@ -24,36 +24,43 @@ import java.util.List;
 public class UserController {
     UserService userService;
 
+    // Đăng kí
     @PostMapping("/register")
     public ApiResponse<UserResponse> register (@Valid @RequestBody UserCreationRequest request){
         return ApiResponse.<UserResponse>builder().data(userService.create(request)).build();
     }
 
+    // Tìm tài khoản người dùng theo id
     @GetMapping("/find-by-id/{id}")
     public ApiResponse<UserResponse> findById (@PathVariable("id") String id){
         return ApiResponse.<UserResponse>builder().data(userService.findById(id)).build();
     }
 
+    // Tìm tài khoản người dùng theo email
     @GetMapping("/find-by-email/{email}")
     public ApiResponse<UserResponse> findByEmail (@PathVariable("email") String email){
         return ApiResponse.<UserResponse>builder().data(userService.findByEmail(email)).build();
     }
 
+    // Lấy tất cả role trong hệ thống
     @GetMapping("/role")
     public ApiResponse<List<RoleResponse>> findAll (){
         return ApiResponse.<List<RoleResponse>>builder().data(userService.findAll()).build();
     }
 
+    // admin khóa tài khoản người dùng
     @PutMapping("/lock/{userId}")
     public ApiResponse<AccountResponse> lockAccount (@PathVariable("userId") String userId){
         return ApiResponse.<AccountResponse>builder().data(userService.lockAccount(userId)).build();
     }
 
+    // admin mở tài khoản người dùng
     @PutMapping("/unlock/{userId}")
     public ApiResponse<AccountResponse> unLockAccount (@PathVariable("userId") String userId){
         return ApiResponse.<AccountResponse>builder().data(userService.unLockAccount(userId)).build();
     }
 
+    // Lấy tất cả tài khoản trong hệ thống
     @GetMapping("/find-all-account")
     public ApiResponse<PageResponse<AccountResponse>> findAllAccount (
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
@@ -62,6 +69,7 @@ public class UserController {
                 .data(userService.findAllAccount(page, size)).build();
     }
 
+    // Tìm kiếm tài khoản theo keyword (một phần của email)
     @GetMapping("/search")
     public ApiResponse<PageResponse<AccountResponse>> findAllAccountByKeyword (
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,

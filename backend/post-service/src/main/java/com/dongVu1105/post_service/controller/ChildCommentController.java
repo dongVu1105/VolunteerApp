@@ -24,6 +24,7 @@ public class ChildCommentController {
     ChildCommentService childCommentService;
     ObjectMapper objectMapper;
 
+    // Trả lời một bình luận
     @PostMapping("/create")
     public ApiResponse<ChildCommentResponse> create (
             @RequestPart(value = "request") String requestJson,
@@ -32,12 +33,14 @@ public class ChildCommentController {
         return ApiResponse.<ChildCommentResponse>builder().data(childCommentService.create(file, request)).build();
     }
 
+    // Xóa trả lời của một bình luận
     @DeleteMapping("/delete/{child-commentId}")
     public ApiResponse<Void> delete (@PathVariable("child-commentId") String childCommentId){
         childCommentService.delete(childCommentId);
         return ApiResponse.<Void>builder().build();
     }
 
+    // Tìm tất cả lượt trả lời của một bình luận
     @GetMapping("/find-by-commentId")
     public ApiResponse<PageResponse<ChildCommentResponse>> findAllByCommentId (
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,

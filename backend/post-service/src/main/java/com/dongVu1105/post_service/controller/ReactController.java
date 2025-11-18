@@ -23,17 +23,20 @@ public class ReactController {
     ReactService reactService;
     ObjectMapper objectMapper;
 
+    // Thích một bài viết
     @PostMapping("/create/{postId}")
     public ApiResponse<ReactResponse> create (@PathVariable("postId") String postId) {
         return ApiResponse.<ReactResponse>builder().data(reactService.create(postId)).build();
     }
 
+    // Hủy thích 1 bài viết
     @DeleteMapping("/delete/{reactId}")
     public ApiResponse<Void> delete (@PathVariable("reactId") String reactId){
         reactService.delete(reactId);
         return ApiResponse.<Void>builder().build();
     }
 
+    // Tìm tất cả lượt thích trong bài viết
     @GetMapping("/find-by-postId")
     public ApiResponse<PageResponse<ReactResponse>> findAllByPostId (
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,

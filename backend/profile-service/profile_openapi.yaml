@@ -1,0 +1,364 @@
+openapi: 3.0.3
+info:
+  title: Profile Service API
+  description: API cho dịch vụ quản lý hồ sơ người dùng trong hệ thống VolunteerHub
+  version: 1.0.0
+  contact:
+    name: Dong Vu
+    email: dongvu1105@example.com
+
+servers:
+  - url: http://localhost:8081/profile
+    description: Development server
+
+tags:
+  - name: User Profile
+    description: Các endpoint công khai để quản lý hồ sơ người dùng
+  - name: Internal Profile
+    description: Các endpoint nội bộ dành cho giao tiếp giữa các service
+
+paths:
+  /user/{userId}:
+    get:
+      tags:
+        - User Profile
+      summary: Tìm profile theo user ID
+      description: Lấy thông tin hồ sơ người dùng dựa trên ID người dùng
+      operationId: findByUserId
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ID của người dùng
+          schema:
+            type: string
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: Tìm thấy hồ sơ người dùng
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserProfileResponse'
+        '404':
+          description: Không tìm thấy hồ sơ người dùng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /user/find/{username}:
+    get:
+      tags:
+        - User Profile
+      summary: Tìm profile theo username
+      description: Lấy thông tin hồ sơ người dùng dựa trên tên đăng nhập
+      operationId: findByUsername
+      parameters:
+        - name: username
+          in: path
+          required: true
+          description: Tên đăng nhập của người dùng
+          schema:
+            type: string
+          example: "user123"
+      responses:
+        '200':
+          description: Tìm thấy hồ sơ người dùng
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserProfileResponse'
+        '404':
+          description: Không tìm thấy hồ sơ người dùng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /internal/user:
+    post:
+      tags:
+        - Internal Profile
+      summary: Tạo hồ sơ người dùng mới
+      description: Endpoint nội bộ để tạo hồ sơ người dùng mới. Được gọi từ các service khác trong hệ thống.
+      operationId: createProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileCreationRequest'
+            examples:
+              example1:
+                value:
+                  userId: "123e4567-e89b-12d3-a456-426614174000"
+                  username: "user123"
+                  firstName: "John"
+                  lastName: "Doe"
+                  phoneNumber: "0123456789"
+                  birthday: "1990-01-01"
+                  identityNumber: "123456789012"
+                  gender: true
+      responses:
+        '200':
+          description: Tạo hồ sơ thành công
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserProfileResponse'
+        '400':
+          description: Dữ liệu đầu vào không hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '409':
+          description: Hồ sơ đã tồn tại
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /internal/user/{userId}:
+    get:
+      tags:
+        - Internal Profile
+      summary: Tìm profile theo user ID (Internal)
+      description: Endpoint nội bộ để lấy thông tin hồ sơ người dùng dựa trên ID người dùng
+      operationId: findByUserIdInternal
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ID của người dùng
+          schema:
+            type: string
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: Tìm thấy hồ sơ người dùng
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserProfileResponse'
+        '404':
+          description: Không tìm thấy hồ sơ người dùng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /internal/userId-list:
+    post:
+      tags:
+        - Internal Profile
+      summary: Lấy danh sách profile theo danh sách user ID
+      description: Endpoint nội bộ để lấy thông tin hồ sơ của nhiều người dùng dựa trên danh sách ID người dùng
+      operationId: findAllByUserIdList
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetProfileRequest'
+            examples:
+              example1:
+                value:
+                  userIdList:
+                    - "123e4567-e89b-12d3-a456-426614174000"
+                    - "223e4567-e89b-12d3-a456-426614174001"
+                    - "323e4567-e89b-12d3-a456-426614174002"
+      responses:
+        '200':
+          description: Danh sách hồ sơ người dùng
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/UserProfileResponse'
+        '400':
+          description: Dữ liệu đầu vào không hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /internal/find/{username}:
+    get:
+      tags:
+        - Internal Profile
+      summary: Tìm profile theo username (Internal)
+      description: Endpoint nội bộ để lấy thông tin hồ sơ người dùng dựa trên tên đăng nhập
+      operationId: findByUsernameInternal
+      parameters:
+        - name: username
+          in: path
+          required: true
+          description: Tên đăng nhập của người dùng
+          schema:
+            type: string
+          example: "user123"
+      responses:
+        '200':
+          description: Tìm thấy hồ sơ người dùng
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserProfileResponse'
+        '404':
+          description: Không tìm thấy hồ sơ người dùng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+components:
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: Mã trạng thái (0 = thành công)
+          default: 0
+          example: 0
+        message:
+          type: string
+          description: Thông báo kết quả
+          default: "success!"
+          example: "success!"
+        data:
+          type: object
+          description: Dữ liệu trả về
+
+    ProfileCreationRequest:
+      type: object
+      required:
+        - userId
+        - username
+      properties:
+        userId:
+          type: string
+          description: ID của người dùng từ identity service
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        username:
+          type: string
+          description: Tên đăng nhập
+          example: "user123"
+        firstName:
+          type: string
+          description: Tên
+          example: "John"
+        lastName:
+          type: string
+          description: Họ
+          example: "Doe"
+        phoneNumber:
+          type: string
+          description: Số điện thoại
+          example: "0123456789"
+        birthday:
+          type: string
+          format: date
+          description: Ngày sinh (yyyy-MM-dd)
+          example: "1990-01-01"
+        identityNumber:
+          type: string
+          description: Số CMND/CCCD
+          example: "123456789012"
+        gender:
+          type: boolean
+          description: Giới tính (true = nam, false = nữ)
+          example: true
+
+    GetProfileRequest:
+      type: object
+      required:
+        - userIdList
+      properties:
+        userIdList:
+          type: array
+          description: Danh sách ID người dùng cần lấy thông tin
+          items:
+            type: string
+          example:
+            - "123e4567-e89b-12d3-a456-426614174000"
+            - "223e4567-e89b-12d3-a456-426614174001"
+
+    UserProfileResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID hồ sơ trong Neo4j
+          example: "abc123-def456-ghi789"
+        userId:
+          type: string
+          description: ID người dùng từ identity service
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        username:
+          type: string
+          description: Tên đăng nhập
+          example: "user123"
+        firstName:
+          type: string
+          description: Tên
+          example: "John"
+        lastName:
+          type: string
+          description: Họ
+          example: "Doe"
+        phoneNumber:
+          type: string
+          description: Số điện thoại
+          example: "0123456789"
+        birthday:
+          type: string
+          format: date
+          description: Ngày sinh
+          example: "1990-01-01"
+        identityNumber:
+          type: string
+          description: Số CMND/CCCD
+          example: "123456789012"
+        gender:
+          type: boolean
+          description: Giới tính (true = nam, false = nữ)
+          example: true
+        avatar:
+          type: string
+          format: uri
+          description: URL ảnh đại diện
+          example: "http://localhost:8888/api/v1/file/media/download/9faaaad8-359f-4cc8-b5da-8194dc0e23db.jpg"

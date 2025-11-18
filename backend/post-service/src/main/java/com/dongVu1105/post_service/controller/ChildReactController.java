@@ -17,17 +17,20 @@ import org.springframework.web.bind.annotation.*;
 public class ChildReactController {
     ChildReactService childReactService;
 
+    // Thích bình luận
     @PostMapping("/create/{commentId}")
     public ApiResponse<ChildReactResponse> create (@PathVariable("commentId") String commentId) {
         return ApiResponse.<ChildReactResponse>builder().data(childReactService.create(commentId)).build();
     }
 
+    // Hủy thích bình luận
     @DeleteMapping("/delete/{child-reactId}")
     public ApiResponse<Void> delete (@PathVariable("child-reactId") String childReactId){
         childReactService.delete(childReactId);
         return ApiResponse.<Void>builder().build();
     }
 
+    // Lấy danh sách lượt thích của bình luận
     @GetMapping("/find-by-commentId")
     public ApiResponse<PageResponse<ChildReactResponse>> findAllByCommentId (
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,

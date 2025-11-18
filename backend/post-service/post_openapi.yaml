@@ -1,0 +1,854 @@
+openapi: 3.0.3
+info:
+  title: Post Service API
+  description: API cho quản lý bài viết, bình luận và tương tác trong sự kiện
+  version: 1.0.0
+  contact:
+    name: Dong Vu
+    email: dongvu1105@example.com
+
+servers:
+  - url: http://localhost:8084
+    description: Local Development Server
+
+tags:
+  - name: Post
+    description: Quản lý bài viết trong sự kiện
+  - name: Comment
+    description: Quản lý bình luận của bài viết
+  - name: Child Comment
+    description: Quản lý phản hồi cho bình luận
+  - name: React
+    description: Quản lý lượt thích bài viết
+  - name: Child React
+    description: Quản lý lượt thích bình luận
+
+paths:
+  /create:
+    post:
+      tags:
+        - Post
+      summary: Tạo bài viết trong sự kiện
+      description: Tạo một bài viết mới trong sự kiện với nội dung văn bản và tùy chọn đính kèm file ảnh
+      operationId: createPost
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - request
+              properties:
+                request:
+                  type: string
+                  description: JSON string chứa thông tin bài viết (PostRequest)
+                  example: '{"eventId":"event123","text":"Nội dung bài viết"}'
+                file:
+                  type: string
+                  format: binary
+                  description: File ảnh đính kèm (không bắt buộc)
+      responses:
+        '200':
+          description: Tạo bài viết thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostApiResponse'
+
+  /delete/{postId}:
+    delete:
+      tags:
+        - Post
+      summary: Xóa bài viết trong sự kiện
+      description: Xóa một bài viết cụ thể dựa trên ID
+      operationId: deletePost
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          description: ID của bài viết cần xóa
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Xóa bài viết thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoidApiResponse'
+
+  /find-all:
+    get:
+      tags:
+        - Post
+      summary: Tìm tất cả bài viết trong sự kiện
+      description: Lấy danh sách phân trang các bài viết trong một sự kiện cụ thể
+      operationId: findAllPostsByEventId
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: Số trang (mặc định là 1)
+          schema:
+            type: integer
+            default: 1
+        - name: size
+          in: query
+          required: false
+          description: Số lượng bài viết mỗi trang (mặc định là 10)
+          schema:
+            type: integer
+            default: 10
+        - name: eventId
+          in: query
+          required: true
+          description: ID của sự kiện
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lấy danh sách bài viết thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostPageApiResponse'
+
+  /{id}:
+    get:
+      tags:
+        - Post
+      summary: Tìm bài viết theo ID
+      description: Lấy thông tin chi tiết của một bài viết dựa trên ID
+      operationId: findPostById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID của bài viết
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lấy thông tin bài viết thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostApiResponse'
+
+  /comment/create:
+    post:
+      tags:
+        - Comment
+      summary: Tạo bình luận cho bài viết
+      description: Tạo một bình luận mới cho bài viết với nội dung văn bản và tùy chọn đính kèm file ảnh
+      operationId: createComment
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - request
+              properties:
+                request:
+                  type: string
+                  description: JSON string chứa thông tin bình luận (CommentRequest)
+                  example: '{"postId":"post123","text":"Nội dung bình luận"}'
+                file:
+                  type: string
+                  format: binary
+                  description: File ảnh đính kèm (không bắt buộc)
+      responses:
+        '200':
+          description: Tạo bình luận thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentApiResponse'
+
+  /comment/delete/{commentId}:
+    delete:
+      tags:
+        - Comment
+      summary: Xóa bình luận cho bài viết
+      description: Xóa một bình luận cụ thể dựa trên ID
+      operationId: deleteComment
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          description: ID của bình luận cần xóa
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Xóa bình luận thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoidApiResponse'
+
+  /comment/find-by-postId:
+    get:
+      tags:
+        - Comment
+      summary: Tìm tất cả bình luận trong bài viết
+      description: Lấy danh sách phân trang các bình luận của một bài viết cụ thể
+      operationId: findAllCommentsByPostId
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: Số trang (mặc định là 1)
+          schema:
+            type: integer
+            default: 1
+        - name: size
+          in: query
+          required: false
+          description: Số lượng bình luận mỗi trang (mặc định là 10)
+          schema:
+            type: integer
+            default: 10
+        - name: postId
+          in: query
+          required: true
+          description: ID của bài viết
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lấy danh sách bình luận thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentPageApiResponse'
+
+  /child-comment/create:
+    post:
+      tags:
+        - Child Comment
+      summary: Trả lời bình luận
+      description: Tạo một câu trả lời mới cho bình luận với nội dung văn bản và tùy chọn đính kèm file ảnh
+      operationId: createChildComment
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - request
+              properties:
+                request:
+                  type: string
+                  description: JSON string chứa thông tin trả lời (ChildCommentRequest)
+                  example: '{"commentId":"comment123","text":"Nội dung trả lời"}'
+                file:
+                  type: string
+                  format: binary
+                  description: File ảnh đính kèm (không bắt buộc)
+      responses:
+        '200':
+          description: Tạo trả lời thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChildCommentApiResponse'
+
+  /child-comment/delete/{child-commentId}:
+    delete:
+      tags:
+        - Child Comment
+      summary: Xóa trả lời của bình luận
+      description: Xóa một câu trả lời cụ thể dựa trên ID
+      operationId: deleteChildComment
+      parameters:
+        - name: child-commentId
+          in: path
+          required: true
+          description: ID của trả lời cần xóa
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Xóa trả lời thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoidApiResponse'
+
+  /child-comment/find-by-commentId:
+    get:
+      tags:
+        - Child Comment
+      summary: Tìm tất cả lượt trả lời của bình luận
+      description: Lấy danh sách phân trang các câu trả lời của một bình luận cụ thể
+      operationId: findAllChildCommentsByCommentId
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: Số trang (mặc định là 1)
+          schema:
+            type: integer
+            default: 1
+        - name: size
+          in: query
+          required: false
+          description: Số lượng trả lời mỗi trang (mặc định là 10)
+          schema:
+            type: integer
+            default: 10
+        - name: commentId
+          in: query
+          required: true
+          description: ID của bình luận
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lấy danh sách trả lời thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChildCommentPageApiResponse'
+
+  /react/create/{postId}:
+    post:
+      tags:
+        - React
+      summary: Thích bài viết
+      description: Tạo một lượt thích mới cho bài viết
+      operationId: createReact
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          description: ID của bài viết cần thích
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Thích bài viết thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReactApiResponse'
+
+  /react/delete/{reactId}:
+    delete:
+      tags:
+        - React
+      summary: Hủy thích bài viết
+      description: Xóa một lượt thích cụ thể dựa trên ID
+      operationId: deleteReact
+      parameters:
+        - name: reactId
+          in: path
+          required: true
+          description: ID của lượt thích cần xóa
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Hủy thích bài viết thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoidApiResponse'
+
+  /react/find-by-postId:
+    get:
+      tags:
+        - React
+      summary: Tìm tất cả lượt thích trong bài viết
+      description: Lấy danh sách phân trang các lượt thích của một bài viết cụ thể
+      operationId: findAllReactsByPostId
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: Số trang (mặc định là 1)
+          schema:
+            type: integer
+            default: 1
+        - name: size
+          in: query
+          required: false
+          description: Số lượng lượt thích mỗi trang (mặc định là 10)
+          schema:
+            type: integer
+            default: 10
+        - name: postId
+          in: query
+          required: true
+          description: ID của bài viết
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lấy danh sách lượt thích thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReactPageApiResponse'
+
+  /child-react/create/{commentId}:
+    post:
+      tags:
+        - Child React
+      summary: Thích bình luận
+      description: Tạo một lượt thích mới cho bình luận
+      operationId: createChildReact
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          description: ID của bình luận cần thích
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Thích bình luận thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChildReactApiResponse'
+
+  /child-react/delete/{child-reactId}:
+    delete:
+      tags:
+        - Child React
+      summary: Hủy thích bình luận
+      description: Xóa một lượt thích bình luận cụ thể dựa trên ID
+      operationId: deleteChildReact
+      parameters:
+        - name: child-reactId
+          in: path
+          required: true
+          description: ID của lượt thích bình luận cần xóa
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Hủy thích bình luận thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoidApiResponse'
+
+  /child-react/find-by-commentId:
+    get:
+      tags:
+        - Child React
+      summary: Lấy danh sách lượt thích của bình luận
+      description: Lấy danh sách phân trang các lượt thích của một bình luận cụ thể
+      operationId: findAllChildReactsByCommentId
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: Số trang (mặc định là 1)
+          schema:
+            type: integer
+            default: 1
+        - name: size
+          in: query
+          required: false
+          description: Số lượng lượt thích mỗi trang (mặc định là 10)
+          schema:
+            type: integer
+            default: 10
+        - name: commentId
+          in: query
+          required: true
+          description: ID của bình luận
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lấy danh sách lượt thích bình luận thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChildReactPageApiResponse'
+
+components:
+  schemas:
+    # Request Schemas
+    PostRequest:
+      type: object
+      required:
+        - eventId
+        - text
+      properties:
+        eventId:
+          type: string
+          description: ID của sự kiện
+          example: event123
+        text:
+          type: string
+          description: Nội dung bài viết
+          example: Đây là nội dung bài viết
+
+    CommentRequest:
+      type: object
+      required:
+        - postId
+        - text
+      properties:
+        postId:
+          type: string
+          description: ID của bài viết
+          example: post123
+        text:
+          type: string
+          description: Nội dung bình luận
+          example: Đây là nội dung bình luận
+
+    ChildCommentRequest:
+      type: object
+      required:
+        - commentId
+        - text
+      properties:
+        commentId:
+          type: string
+          description: ID của bình luận gốc
+          example: comment123
+        text:
+          type: string
+          description: Nội dung trả lời
+          example: Đây là nội dung trả lời
+
+    # Response Schemas
+    PostResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID của bài viết
+        eventId:
+          type: string
+          description: ID của sự kiện
+        ownerId:
+          type: string
+          description: ID của người tạo bài viết
+        ownerUsername:
+          type: string
+          description: Tên người dùng của người tạo
+        ownerAvatar:
+          type: string
+          description: URL ảnh đại diện của người tạo
+        reactCount:
+          type: integer
+          format: int64
+          description: Số lượng lượt thích
+        commentCount:
+          type: integer
+          format: int64
+          description: Số lượng bình luận
+        isReactedByCurrentUser:
+          type: boolean
+          description: Người dùng hiện tại đã thích hay chưa
+        text:
+          type: string
+          description: Nội dung bài viết
+        imageURL:
+          type: string
+          description: URL hình ảnh đính kèm
+        createdDate:
+          type: string
+          description: Ngày tạo bài viết
+
+    CommentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID của bình luận
+        postId:
+          type: string
+          description: ID của bài viết
+        ownerId:
+          type: string
+          description: ID của người tạo bình luận
+        ownerUsername:
+          type: string
+          description: Tên người dùng của người tạo
+        ownerAvatar:
+          type: string
+          description: URL ảnh đại diện của người tạo
+        reactCount:
+          type: integer
+          format: int64
+          description: Số lượng lượt thích
+        commentCount:
+          type: integer
+          format: int64
+          description: Số lượng trả lời
+        isReactedByCurrentUser:
+          type: boolean
+          description: Người dùng hiện tại đã thích hay chưa
+        text:
+          type: string
+          description: Nội dung bình luận
+        imageURL:
+          type: string
+          description: URL hình ảnh đính kèm
+        createdDate:
+          type: string
+          description: Ngày tạo bình luận
+
+    ChildCommentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID của trả lời
+        commentId:
+          type: string
+          description: ID của bình luận gốc
+        ownerId:
+          type: string
+          description: ID của người tạo trả lời
+        ownerUsername:
+          type: string
+          description: Tên người dùng của người tạo
+        ownerAvatar:
+          type: string
+          description: URL ảnh đại diện của người tạo
+        text:
+          type: string
+          description: Nội dung trả lời
+        imageURL:
+          type: string
+          description: URL hình ảnh đính kèm
+        createdDate:
+          type: string
+          description: Ngày tạo trả lời
+
+    ReactResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID của lượt thích
+        postId:
+          type: string
+          description: ID của bài viết
+        ownerId:
+          type: string
+          description: ID của người thích
+        ownerAvatar:
+          type: string
+          description: URL ảnh đại diện của người thích
+        ownerUsername:
+          type: string
+          description: Tên người dùng của người thích
+        createdDate:
+          type: string
+          description: Ngày tạo lượt thích
+
+    ChildReactResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID của lượt thích bình luận
+        commentId:
+          type: string
+          description: ID của bình luận
+        ownerId:
+          type: string
+          description: ID của người thích
+        ownerAvatar:
+          type: string
+          description: URL ảnh đại diện của người thích
+        ownerUsername:
+          type: string
+          description: Tên người dùng của người thích
+        createdDate:
+          type: string
+          description: Ngày tạo lượt thích
+
+    PageResponse:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+          description: Trang hiện tại
+        totalPages:
+          type: integer
+          description: Tổng số trang
+        pageSize:
+          type: integer
+          description: Số lượng phần tử mỗi trang
+        totalElements:
+          type: integer
+          format: int64
+          description: Tổng số phần tử
+        hasNextPage:
+          type: boolean
+          description: Có trang tiếp theo hay không
+        hasPreviousPage:
+          type: boolean
+          description: Có trang trước hay không
+        result:
+          type: array
+          description: Danh sách kết quả
+          items:
+            type: object
+
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          default: 0
+          description: Mã trạng thái (0 là thành công)
+        message:
+          type: string
+          default: success!
+          description: Thông báo kết quả
+        data:
+          type: object
+          description: Dữ liệu trả về
+
+    # Typed API Response Schemas
+    PostApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/PostResponse'
+
+    CommentApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/CommentResponse'
+
+    ChildCommentApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/ChildCommentResponse'
+
+    ReactApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/ReactResponse'
+
+    ChildReactApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/ChildReactResponse'
+
+    VoidApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              nullable: true
+
+    PostPageApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              allOf:
+                - $ref: '#/components/schemas/PageResponse'
+                - type: object
+                  properties:
+                    result:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/PostResponse'
+
+    CommentPageApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              allOf:
+                - $ref: '#/components/schemas/PageResponse'
+                - type: object
+                  properties:
+                    result:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CommentResponse'
+
+    ChildCommentPageApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              allOf:
+                - $ref: '#/components/schemas/PageResponse'
+                - type: object
+                  properties:
+                    result:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ChildCommentResponse'
+
+    ReactPageApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              allOf:
+                - $ref: '#/components/schemas/PageResponse'
+                - type: object
+                  properties:
+                    result:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ReactResponse'
+
+    ChildReactPageApiResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              allOf:
+                - $ref: '#/components/schemas/PageResponse'
+                - type: object
+                  properties:
+                    result:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ChildReactResponse'
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token để xác thực người dùng
+
+security:
+  - BearerAuth: []

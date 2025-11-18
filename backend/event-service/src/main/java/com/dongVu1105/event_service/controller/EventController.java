@@ -66,6 +66,7 @@ public class EventController {
         return ApiResponse.<EventResponse>builder().data(eventService.findById(eventId)).build();
     }
 
+    // Kiểm tra trạng thái event (admin duyệt chưa)
     @GetMapping("/status/{eventId}")
     public ApiResponse<Boolean> ableToPost (@PathVariable("eventId") String eventId){
         return ApiResponse.<Boolean>builder().data(eventService.ableToPost(eventId)).build();

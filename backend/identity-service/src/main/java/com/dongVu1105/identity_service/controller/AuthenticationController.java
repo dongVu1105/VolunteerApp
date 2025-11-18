@@ -29,12 +29,14 @@ import java.text.ParseException;
 public class AuthenticationController {
     AuthenticationService authenticationService;
 
+    // Đăng nhập
     @PostMapping("/login")
     public ApiResponse<AuthenticationResponse> login (@Valid @RequestBody AuthenticationRequest request){
         return ApiResponse.<AuthenticationResponse>builder()
                 .data(authenticationService.authenticate(request)).build();
     }
 
+    // Làm mới token
     @PostMapping("/refresh-token")
     public ApiResponse<AuthenticationResponse> refreshToken (@RequestBody RefreshTokenRequest request)
             throws ParseException, JOSEException {
@@ -42,12 +44,14 @@ public class AuthenticationController {
                 .data(authenticationService.refreshToken(request)).build();
     }
 
+    // Đăng xuất
     @PostMapping("/logout")
     public ApiResponse<Void> logout (@RequestBody LogoutRequest request) {
         authenticationService.logout(request);
         return ApiResponse.<Void>builder().build();
     }
 
+    // Xác thực token
     @PostMapping("/introspect")
     public ApiResponse<IntrospectResponse> introspect (@RequestBody IntrospectRequest request){
         return ApiResponse.<IntrospectResponse>builder()
