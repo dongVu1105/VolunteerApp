@@ -16,11 +16,13 @@ import org.springframework.web.bind.annotation.*;
 public class ProfileController {
     UserProfileService userProfileService;
 
+    // Tìm profile theo user id
     @GetMapping("/{userId}")
     public ApiResponse<UserProfileResponse> findById (@PathVariable("userId") String userId){
         return ApiResponse.<UserProfileResponse>builder().data(userProfileService.findByUserId(userId)).build();
     }
 
+    // Tìm profile theo username
     @GetMapping("/find/{username}")
     public ApiResponse<UserProfileResponse> findByUsername (@PathVariable("username") String username){
         return ApiResponse.<UserProfileResponse>builder().data(userProfileService.findByUsername(username)).build();

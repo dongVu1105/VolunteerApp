@@ -1,0 +1,366 @@
+openapi: 3.0.3
+info:
+  title: Notification Service API
+  description: |
+    API cho dịch vụ thông báo trong hệ thống VolunteerHub.
+    Service này quản lý các thông báo được gửi đến người dùng thông qua các sự kiện từ Kafka.
+  version: 1.0.0
+  contact:
+    name: Dong Vu
+    email: dongvu1105@example.com
+
+servers:
+  - url: http://localhost:8083/notification
+    description: Local development server
+
+tags:
+  - name: Notification
+    description: Quản lý thông báo của người dùng
+
+paths:
+  /find-all:
+    get:
+      tags:
+        - Notification
+      summary: Lấy tất cả thông báo của người dùng
+      description: |
+        Endpoint này cho phép người dùng lấy danh sách tất cả các thông báo của mình.
+        Kết quả được phân trang với các tham số page và size có thể tùy chỉnh.
+        Người dùng được xác định thông qua JWT token trong header Authorization.
+      operationId: findAllByUserId
+      parameters:
+        - name: page
+          in: query
+          description: Số trang cần lấy (bắt đầu từ 1)
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+          example: 1
+        - name: size
+          in: query
+          description: Số lượng thông báo trên mỗi trang
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+          example: 10
+      responses:
+        '200':
+          description: Lấy danh sách thông báo thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationPageResponse'
+              examples:
+                success:
+                  summary: Ví dụ phản hồi thành công
+                  value:
+                    code: 0
+                    message: success!
+                    data:
+                      currentPage: 1
+                      totalPages: 3
+                      pageSize: 10
+                      totalElements: 25
+                      hasNextPage: true
+                      hasPreviousPage: false
+                      result:
+                        - id: "507f1f77bcf86cd799439011"
+                          subject: "Sự kiện mới được tạo"
+                          message: "Sự kiện 'Làm sạch bãi biển' đã được tạo và đang chờ duyệt"
+                          receiverId:
+                            - "admin123"
+                          info:
+                            eventId: "event123"
+                          createdDate: "2025-11-18 10:30:00"
+                          isRead: false
+                        - id: "507f1f77bcf86cd799439012"
+                          subject: "Đăng ký tham gia sự kiện"
+                          message: "Người dùng Nguyễn Văn A đã đăng ký tham gia sự kiện của bạn"
+                          receiverId:
+                            - "eventmanager456"
+                          info:
+                            eventUserId: "eventuser789"
+                          createdDate: "2025-11-18 09:15:00"
+                          isRead: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - bearerAuth: []
+
+  /{notificationId}:
+    put:
+      tags:
+        - Notification
+      summary: Đánh dấu thông báo đã đọc
+      description: |
+        Endpoint này cho phép người dùng đánh dấu một thông báo cụ thể đã được đọc.
+        Sau khi gọi endpoint này, trường isRead của thông báo sẽ được cập nhật thành true.
+      operationId: alreadyRead
+      parameters:
+        - name: notificationId
+          in: path
+          description: ID của thông báo cần đánh dấu đã đọc
+          required: true
+          schema:
+            type: string
+          example: "507f1f77bcf86cd799439011"
+      responses:
+        '200':
+          description: Cập nhật trạng thái thông báo thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationSingleResponse'
+              examples:
+                success:
+                  summary: Ví dụ phản hồi thành công
+                  value:
+                    code: 0
+                    message: success!
+                    data:
+                      id: "507f1f77bcf86cd799439011"
+                      subject: "Sự kiện mới được tạo"
+                      message: "Sự kiện 'Làm sạch bãi biển' đã được tạo và đang chờ duyệt"
+                      receiverId:
+                        - "admin123"
+                      info:
+                        eventId: "event123"
+                      createdDate: "2025-11-18 10:30:00"
+                      isRead: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      security:
+        - bearerAuth: []
+
+components:
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: Mã trạng thái của phản hồi (0 = thành công)
+          default: 0
+          example: 0
+        message:
+          type: string
+          description: Thông điệp mô tả kết quả
+          default: success!
+          example: success!
+        data:
+          type: object
+          description: Dữ liệu phản hồi
+      required:
+        - code
+        - message
+
+    PageResponse:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+          description: Trang hiện tại
+          example: 1
+        totalPages:
+          type: integer
+          description: Tổng số trang
+          example: 5
+        pageSize:
+          type: integer
+          description: Số lượng phần tử trên mỗi trang
+          example: 10
+        totalElements:
+          type: integer
+          format: int64
+          description: Tổng số phần tử
+          example: 50
+        hasNextPage:
+          type: boolean
+          description: Có trang tiếp theo hay không
+          example: true
+        hasPreviousPage:
+          type: boolean
+          description: Có trang trước hay không
+          example: false
+        result:
+          type: array
+          description: Danh sách kết quả
+          items:
+            type: object
+      required:
+        - currentPage
+        - totalPages
+        - pageSize
+        - totalElements
+        - hasNextPage
+        - hasPreviousPage
+        - result
+
+    NotificationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID của thông báo
+          example: "507f1f77bcf86cd799439011"
+        subject:
+          type: string
+          description: Tiêu đề thông báo
+          example: "Sự kiện mới được tạo"
+        message:
+          type: string
+          description: Nội dung chi tiết của thông báo
+          example: "Sự kiện 'Làm sạch bãi biển' đã được tạo và đang chờ duyệt"
+        receiverId:
+          type: array
+          description: Danh sách ID người nhận thông báo
+          items:
+            type: string
+          example: ["admin123", "user456"]
+        info:
+          type: object
+          description: Thông tin bổ sung về thông báo (có thể là EventInfo, EventUserInfo, hoặc PostInfo)
+          oneOf:
+            - $ref: '#/components/schemas/EventInfo'
+            - $ref: '#/components/schemas/EventUserInfo'
+            - $ref: '#/components/schemas/PostInfo'
+        createdDate:
+          type: string
+          description: Thời gian tạo thông báo (định dạng đã format)
+          example: "2025-11-18 10:30:00"
+        isRead:
+          type: boolean
+          description: Trạng thái đã đọc của thông báo
+          example: false
+      required:
+        - id
+        - subject
+        - message
+        - receiverId
+        - createdDate
+        - isRead
+
+    EventInfo:
+      type: object
+      description: Thông tin về sự kiện trong thông báo
+      properties:
+        eventId:
+          type: string
+          description: ID của sự kiện
+          example: "event123"
+
+    EventUserInfo:
+      type: object
+      description: Thông tin về đăng ký sự kiện trong thông báo
+      properties:
+        eventUserId:
+          type: string
+          description: ID của bản đăng ký sự kiện
+          example: "eventuser789"
+
+    PostInfo:
+      type: object
+      description: Thông tin về bài viết trong thông báo (cho các thông báo liên quan đến post, comment, react)
+      properties:
+        postId:
+          type: string
+          description: ID của bài viết
+          example: "post456"
+        commentId:
+          type: string
+          description: ID của bình luận (nếu có)
+          example: "comment789"
+
+    NotificationPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              allOf:
+                - $ref: '#/components/schemas/PageResponse'
+                - type: object
+                  properties:
+                    result:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/NotificationResponse'
+
+    NotificationSingleResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              $ref: '#/components/schemas/NotificationResponse'
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: Mã lỗi
+          example: 1001
+        message:
+          type: string
+          description: Thông điệp lỗi
+          example: "Unauthorized"
+      required:
+        - code
+        - message
+
+  responses:
+    Unauthorized:
+      description: Không có quyền truy cập - Token không hợp lệ hoặc đã hết hạn
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 1001
+            message: "Unauthorized - Token is invalid or expired"
+
+    NotFound:
+      description: Không tìm thấy tài nguyên
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 1004
+            message: "Notification not found"
+
+    InternalServerError:
+      description: Lỗi máy chủ nội bộ
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            code: 9999
+            message: "Internal server error"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT token để xác thực người dùng.
+        Token có thể lấy từ Identity Service sau khi đăng nhập thành công.
+        
+        Cách sử dụng: Thêm header Authorization với giá trị "Bearer {token}"
+
+security:
+  - bearerAuth: []

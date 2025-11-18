@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class NotificationController {
     NotificationService notificationService;
 
+    // Lấy tất cả thông báo của người dùng
     @GetMapping("/find-all")
     public ApiResponse<PageResponse<NotificationResponse>> findAllByUserId (
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,

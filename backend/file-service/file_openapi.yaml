@@ -1,0 +1,200 @@
+openapi: 3.0.3
+info:
+  title: File Service API
+  description: |
+    API quản lý file và media cho hệ thống VolunteerHub.
+    Service này cung cấp các chức năng upload và download file/ảnh.
+  version: 1.0.0
+  contact:
+    name: DongVu1105
+    email: support@volunteerhub.com
+
+servers:
+  - url: http://localhost:8888/api/v1/file
+    description: API Gateway (Production)
+  - url: http://localhost:8082/file
+    description: File Service Direct (Development)
+
+tags:
+  - name: Media
+    description: Các endpoint công khai để tải xuống file/ảnh
+  - name: Internal Media
+    description: Các endpoint nội bộ để quản lý file (upload)
+
+paths:
+  /media/download/{fileName}:
+    get:
+      tags:
+        - Media
+      summary: Tải xuống file/ảnh
+      description: |
+        Lấy file ảnh từ hệ thống dựa trên tên file.
+        Endpoint này trả về file dưới dạng binary data với content-type phù hợp.
+      operationId: downloadFile
+      parameters:
+        - name: fileName
+          in: path
+          required: true
+          description: Tên file cần tải xuống (UUID)
+          schema:
+            type: string
+            example: "04d602e8-9fb0-459d-b2ed-306c1ec70b98"
+      responses:
+        '200':
+          description: Tải file thành công
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/gif:
+              schema:
+                type: string
+                format: binary
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Type:
+              description: Loại nội dung của file
+              schema:
+                type: string
+                example: "image/jpeg"
+        '404':
+          description: File không tồn tại
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 1004
+                message: "File not found"
+        '500':
+          description: Lỗi server khi đọc file
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /internal/media/upload:
+    post:
+      tags:
+        - Internal Media
+      summary: Upload file/ảnh
+      description: |
+        Upload file lên hệ thống. Endpoint này chỉ dành cho các service nội bộ.
+        File sẽ được lưu trữ với tên UUID và thông tin metadata được lưu vào MongoDB.
+        Yêu cầu authentication token hợp lệ.
+      operationId: uploadFile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: File cần upload (hỗ trợ ảnh, PDF, và các định dạng file khác)
+      responses:
+        '200':
+          description: Upload file thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileUploadResponse'
+              example:
+                code: 0
+                message: "success!"
+                data:
+                  originalFileName: "avatar.jpg"
+                  url: "http://localhost:8888/api/v1/file/media/download/04d602e8-9fb0-459d-b2ed-306c1ec70b98"
+        '400':
+          description: Yêu cầu không hợp lệ (file không được gửi hoặc định dạng sai)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Chưa xác thực hoặc token không hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 1006
+                message: "Unauthenticated"
+        '500':
+          description: Lỗi server khi lưu file
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token để xác thực người dùng
+
+  schemas:
+    FileUploadResponse:
+      type: object
+      description: Response trả về khi upload file thành công
+      properties:
+        code:
+          type: integer
+          description: Mã trạng thái (0 = thành công)
+          example: 0
+        message:
+          type: string
+          description: Thông báo kết quả
+          example: "success!"
+        data:
+          $ref: '#/components/schemas/FileResponse'
+
+    FileResponse:
+      type: object
+      description: Thông tin file sau khi upload
+      properties:
+        originalFileName:
+          type: string
+          description: Tên file gốc
+          example: "avatar.jpg"
+        url:
+          type: string
+          description: URL để tải xuống file
+          example: "http://localhost:8888/api/v1/file/media/download/04d602e8-9fb0-459d-b2ed-306c1ec70b98"
+
+    ErrorResponse:
+      type: object
+      description: Response lỗi chung
+      properties:
+        code:
+          type: integer
+          description: Mã lỗi
+          example: 1004
+        message:
+          type: string
+          description: Thông báo lỗi
+          example: "File not found"
+        data:
+          type: object
+          nullable: true
+          description: Dữ liệu bổ sung (nếu có)

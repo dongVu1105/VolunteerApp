@@ -1,0 +1,1995 @@
+openapi: 3.0.3
+info:
+  title: VolunteerHub Gateway API
+  description: |
+    Tổng hợp tài liệu OpenAPI mô tả toàn bộ API public của hệ thống VolunteerHub
+    sau API Gateway. Các đường dẫn đã bao gồm tiền tố `/api/v1` theo cấu hình gateway.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8888/api/v1
+    description: API Gateway (local)
+tags:
+  - name: Identity Authentication
+    description: Đăng nhập, đăng xuất, quản lý token
+  - name: Identity User Management
+    description: Quản lý tài khoản và vai trò người dùng
+  - name: Profile Public
+    description: Endpoint hồ sơ người dùng dành cho client
+  - name: Profile Internal
+    description: Endpoint nội bộ giữa các microservice cho hồ sơ người dùng
+  - name: File Media
+    description: Tải xuống và upload media
+  - name: Notification
+    description: Quản lý thông báo người dùng
+  - name: Event Management
+    description: CRUD sự kiện và danh mục
+  - name: Event User
+    description: Quản lý người dùng tham gia sự kiện
+  - name: Post
+    description: Quản lý bài viết sự kiện
+  - name: Comment
+    description: Quản lý bình luận bài viết
+  - name: Child Comment
+    description: Quản lý phản hồi của bình luận
+  - name: React
+    description: Lượt thích bài viết
+  - name: Child React
+    description: Lượt thích bình luận
+paths:
+  /identity/auth/login:
+    post:
+      tags:
+        - Identity Authentication
+      summary: Đăng nhập
+      description: Xác thực thông tin đăng nhập và trả về access token + refresh token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthenticationRequest'
+      responses:
+        '200':
+          description: Đăng nhập thành công
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AuthenticationPayload'
+        '400':
+          description: Thông tin đăng nhập không hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /identity/auth/refresh-token:
+    post:
+      tags:
+        - Identity Authentication
+      summary: Làm mới token
+      description: Tạo access token mới từ refresh token hợp lệ.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Làm mới token thành công
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AuthenticationPayload'
+        '401':
+          description: Refresh token không hợp lệ hoặc hết hạn
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /identity/auth/logout:
+    post:
+      tags:
+        - Identity Authentication
+      summary: Đăng xuất
+      description: Vô hiệu hóa access token và refresh token hiện tại.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+      responses:
+        '200':
+          description: Đăng xuất thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /identity/auth/introspect:
+    post:
+      tags:
+        - Identity Authentication
+      summary: Xác thực token
+      description: Kiểm tra access token hiện tại còn hiệu lực hay không.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntrospectRequest'
+      responses:
+        '200':
+          description: Kết quả xác thực token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntrospectResponse'
+  /identity/user/register:
+    post:
+      tags:
+        - Identity User Management
+      summary: Đăng ký tài khoản mới
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreationRequest'
+      responses:
+        '200':
+          description: Đăng ký thành công
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserResponse'
+        '409':
+          description: Email đã tồn tại
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /identity/user/find-by-id/{id}:
+    get:
+      tags:
+        - Identity User Management
+      summary: Lấy tài khoản theo ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tìm thấy người dùng
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: Không tìm thấy người dùng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /identity/user/find-by-email/{email}:
+    get:
+      tags:
+        - Identity User Management
+      summary: Lấy tài khoản theo email
+      parameters:
+        - name: email
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tìm thấy người dùng
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: Không tìm thấy người dùng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /identity/user/role:
+    get:
+      tags:
+        - Identity User Management
+      summary: Danh sách role
+      responses:
+        '200':
+          description: Danh sách vai trò
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/RoleResponse'
+  /identity/user/lock/{userId}:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Identity User Management
+      summary: Khóa tài khoản người dùng
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Khóa tài khoản thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '403':
+          description: Không có quyền
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /identity/user/unlock/{userId}:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Identity User Management
+      summary: Mở khóa tài khoản người dùng
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Mở khóa tài khoản thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /identity/user/find-all-account:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Identity User Management
+      summary: Danh sách tài khoản (phân trang)
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Danh sách tài khoản
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageAccountResponse'
+  /identity/user/search:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Identity User Management
+      summary: Tìm kiếm tài khoản theo keyword
+      parameters:
+        - name: keyword
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: size
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Kết quả tìm kiếm
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageAccountResponse'
+  /profile/user/{userId}:
+    get:
+      tags:
+        - Profile Public
+      summary: Tìm profile theo userId
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Hồ sơ người dùng
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserProfileResponse'
+        '404':
+          description: Không tìm thấy hồ sơ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /profile/user/find/{username}:
+    get:
+      tags:
+        - Profile Public
+      summary: Tìm profile theo username
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Hồ sơ người dùng
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserProfileResponse'
+  /profile/internal/user:
+    post:
+      tags:
+        - Profile Internal
+      summary: Tạo hồ sơ người dùng
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileCreationRequest'
+      responses:
+        '200':
+          description: Tạo hồ sơ thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '409':
+          description: Hồ sơ đã tồn tại
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /profile/internal/user/{userId}:
+    get:
+      tags:
+        - Profile Internal
+      summary: Lấy hồ sơ nội bộ theo userId
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Hồ sơ người dùng
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserProfileResponse'
+  /profile/internal/userId-list:
+    post:
+      tags:
+        - Profile Internal
+      summary: Lấy danh sách hồ sơ theo danh sách userId
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetProfileRequest'
+      responses:
+        '200':
+          description: Danh sách hồ sơ
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/UserProfileResponse'
+  /profile/internal/find/{username}:
+    get:
+      tags:
+        - Profile Internal
+      summary: Tìm hồ sơ nội bộ theo username
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Hồ sơ người dùng
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserProfileResponse'
+  /file/media/download/{fileName}:
+    get:
+      tags:
+        - File Media
+      summary: Tải xuống file/ảnh
+      parameters:
+        - name: fileName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: File trả về dạng nhị phân
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/gif:
+              schema:
+                type: string
+                format: binary
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Không tìm thấy file
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /file/internal/media/upload:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - File Media
+      summary: Upload file nội bộ
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Upload thành công
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/FileResponse'
+        '401':
+          description: Chưa xác thực
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /notification/find-all:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Notification
+      summary: Lấy thông báo của người dùng (phân trang)
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: Danh sách thông báo
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: '#/components/schemas/PageResponse'
+                          - type: object
+                            properties:
+                              result:
+                                type: array
+                                items:
+                                  $ref: '#/components/schemas/NotificationResponse'
+        '401':
+          description: Không có quyền truy cập
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /notification/{notificationId}:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Notification
+      summary: Đánh dấu thông báo đã đọc
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Cập nhật trạng thái thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          description: Không tìm thấy thông báo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /event/create:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Event Management
+      summary: Tạo sự kiện mới
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventCreationRequest'
+      responses:
+        '200':
+          description: Tạo sự kiện thành công
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/EventResponse'
+  /event/update:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Event Management
+      summary: Cập nhật sự kiện
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventUpdateRequest'
+      responses:
+        '200':
+          description: Cập nhật thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /event/category-date:
+    get:
+      tags:
+        - Event Management
+      summary: Lọc sự kiện theo danh mục và ngày
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: size
+          in: query
+          schema:
+            type: integer
+        - name: categoryId
+          in: query
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: toDate
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Danh sách sự kiện
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PageEventResponse'
+  /event/{eventId}:
+    get:
+      tags:
+        - Event Management
+      summary: Lấy sự kiện theo ID
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Sự kiện chi tiết
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/EventResponse'
+        '404':
+          description: Không tìm thấy sự kiện
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /event/status/{eventId}:
+    get:
+      tags:
+        - Event Management
+      summary: Kiểm tra trạng thái duyệt sự kiện
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Trạng thái duyệt
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /event/pending:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Event Management
+      summary: Danh sách sự kiện chờ duyệt
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Danh sách sự kiện
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageEventResponse'
+  /event/accept/{eventId}:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Event Management
+      summary: Duyệt sự kiện
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Duyệt thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /event/delete/{eventId}:
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Event Management
+      summary: Xóa sự kiện
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Xóa thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /event/categories:
+    get:
+      tags:
+        - Event Management
+      summary: Danh sách danh mục sự kiện
+      responses:
+        '200':
+          description: Danh sách danh mục
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/CategoryResponse'
+  /event/user/register:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Event User
+      summary: Đăng ký tham gia sự kiện
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventUserCreationRequest'
+      responses:
+        '200':
+          description: Đăng ký thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /event/user/unsubscribe/{eventId}:
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Event User
+      summary: Hủy đăng ký tham gia
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Hủy thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /event/user/completed-event:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Event User
+      summary: Danh sách sự kiện đã hoàn thành của người dùng
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Danh sách sự kiện
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageEventUserInfoResponse'
+  /event/user/pending:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Event User
+      summary: Người dùng chờ xác nhận
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Danh sách đăng ký chờ xử lý
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageEventUserInfoResponse'
+  /event/user/accept-registration/{eventUserId}:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Event User
+      summary: Chấp nhận đăng ký của người dùng
+      parameters:
+        - name: eventUserId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Cập nhật thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /event/user/reject-registration/{eventUserId}:
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Event User
+      summary: Từ chối đăng ký của người dùng
+      parameters:
+        - name: eventUserId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Từ chối thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /event/user/{eventUserId}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Event User
+      summary: Lấy thông tin đăng ký theo ID
+      parameters:
+        - name: eventUserId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Thông tin đăng ký
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/EventUserResponse'
+  /event/user/confirm-completion/{eventUserId}:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - Event User
+      summary: Xác nhận hoàn thành sự kiện
+      parameters:
+        - name: eventUserId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Cập nhật thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /event/user/attending:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Event User
+      summary: Danh sách người dùng đang tham gia sự kiện
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Danh sách người dùng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageEventUserInfoResponse'
+  /event/user/find-all:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Event User
+      summary: Danh sách người dùng trong sự kiện
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Danh sách người dùng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageEventUserInfoResponse'
+  /event/user/exist/{userId}/{eventId}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Event User
+      summary: Kiểm tra người dùng đã đăng ký sự kiện hay chưa
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: eventId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Kết quả kiểm tra
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /event/user/export/file:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Event User
+      summary: Xuất file danh sách sự kiện và tình nguyện viên
+      responses:
+        '200':
+          description: File JSON được xuất
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventExportResponse'
+  /post/create:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Post
+      summary: Tạo bài viết mới
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+      responses:
+        '200':
+          description: Tạo bài viết thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /post/delete/{postId}:
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Post
+      summary: Xóa bài viết
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Xóa bài viết thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /post/find-all:
+    get:
+      tags:
+        - Post
+      summary: Lấy danh sách bài viết theo sự kiện
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: size
+          in: query
+          schema:
+            type: integer
+        - name: eventId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Danh sách bài viết
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePostResponse'
+  /post/{id}:
+    get:
+      tags:
+        - Post
+      summary: Lấy bài viết theo ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Bài viết chi tiết
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PostResponse'
+  /post/comment/create:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Comment
+      summary: Tạo bình luận mới
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+      responses:
+        '200':
+          description: Tạo bình luận thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /post/comment/delete/{commentId}:
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Comment
+      summary: Xóa bình luận
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Xóa bình luận thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /post/comment/find-by-postId:
+    get:
+      tags:
+        - Comment
+      summary: Danh sách bình luận của bài viết
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: size
+          in: query
+          schema:
+            type: integer
+        - name: postId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Danh sách bình luận
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageCommentResponse'
+  /post/child-comment/create:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Child Comment
+      summary: Tạo phản hồi cho bình luận
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ChildCommentRequest'
+      responses:
+        '200':
+          description: Tạo phản hồi thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /post/child-comment/delete/{childCommentId}:
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Child Comment
+      summary: Xóa phản hồi bình luận
+      parameters:
+        - name: childCommentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Xóa phản hồi thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /post/child-comment/find-by-commentId:
+    get:
+      tags:
+        - Child Comment
+      summary: Danh sách phản hồi theo commentId
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: size
+          in: query
+          schema:
+            type: integer
+        - name: commentId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Danh sách phản hồi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageChildCommentResponse'
+  /post/react/create/{postId}:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - React
+      summary: Thích bài viết
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tạo react thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /post/react/delete/{reactId}:
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - React
+      summary: Hủy thích bài viết
+      parameters:
+        - name: reactId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Hủy react thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /post/react/find-by-postId:
+    get:
+      tags:
+        - React
+      summary: Danh sách lượt thích của bài viết
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: size
+          in: query
+          schema:
+            type: integer
+        - name: postId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Danh sách react
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageReactResponse'
+  /post/child-react/create/{commentId}:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Child React
+      summary: Thích bình luận
+      parameters:
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tạo child react thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /post/child-react/delete/{childReactId}:
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Child React
+      summary: Hủy thích bình luận
+      parameters:
+        - name: childReactId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Hủy child react thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /post/child-react/find-by-commentId:
+    get:
+      tags:
+        - Child React
+      summary: Danh sách lượt thích theo commentId
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: size
+          in: query
+          schema:
+            type: integer
+        - name: commentId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Danh sách child react
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageChildReactResponse'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token lấy từ Identity Service sau khi đăng nhập
+  schemas:
+    ApiResponse:
+      type: object
+      description: Định dạng phản hồi chuẩn trong hệ thống
+      properties:
+        code:
+          type: integer
+          description: 0 = thành công
+          example: 0
+        message:
+          type: string
+          example: success!
+        data:
+          type: object
+          nullable: true
+      required:
+        - code
+        - message
+    ErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              nullable: true
+              type: object
+          example:
+            code: 1001
+            message: Unauthorized
+            data: null
+    AuthenticationRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+    AuthenticationPayload:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        expiresIn:
+          type: integer
+          description: Số giây hết hạn access token
+    RefreshTokenRequest:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+    LogoutRequest:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+    IntrospectRequest:
+      type: object
+      required:
+        - accessToken
+      properties:
+        accessToken:
+          type: string
+    IntrospectResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                valid:
+                  type: boolean
+                userId:
+                  type: string
+                  nullable: true
+    UserCreationRequest:
+      type: object
+      required:
+        - email
+        - password
+        - username
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        username:
+          type: string
+        phoneNumber:
+          type: string
+        fullName:
+          type: string
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        username:
+          type: string
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleResponse'
+        locked:
+          type: boolean
+    RoleResponse:
+      type: object
+      properties:
+        name:
+          type: string
+    PageResponse:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+        totalPages:
+          type: integer
+        pageSize:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        hasNextPage:
+          type: boolean
+        hasPreviousPage:
+          type: boolean
+        result:
+          type: array
+          items:
+            type: object
+      required:
+        - currentPage
+        - totalPages
+        - pageSize
+        - totalElements
+        - hasNextPage
+        - hasPreviousPage
+        - result
+    PageAccountResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              allOf:
+                - $ref: '#/components/schemas/PageResponse'
+                - type: object
+                  properties:
+                    result:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AccountResponse'
+    AccountResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        username:
+          type: string
+        status:
+          type: string
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleResponse'
+    ProfileCreationRequest:
+      type: object
+      required:
+        - userId
+        - username
+      properties:
+        userId:
+          type: string
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phoneNumber:
+          type: string
+        birthday:
+          type: string
+          format: date
+        identityNumber:
+          type: string
+        gender:
+          type: boolean
+    GetProfileRequest:
+      type: object
+      required:
+        - userIdList
+      properties:
+        userIdList:
+          type: array
+          items:
+            type: string
+    UserProfileResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phoneNumber:
+          type: string
+        birthday:
+          type: string
+          format: date
+        identityNumber:
+          type: string
+        gender:
+          type: boolean
+        avatar:
+          type: string
+          format: uri
+    FileResponse:
+      type: object
+      properties:
+        originalFileName:
+          type: string
+        url:
+          type: string
+    NotificationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        subject:
+          type: string
+        message:
+          type: string
+        receiverId:
+          type: array
+          items:
+            type: string
+        info:
+          type: object
+        createdDate:
+          type: string
+        isRead:
+          type: boolean
+    EventCreationRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        location:
+          type: string
+        categoryId:
+          type: string
+        coverImage:
+          type: string
+    EventUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/EventCreationRequest'
+        - type: object
+          properties:
+            id:
+              type: string
+    EventResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        startDate:
+          type: string
+        endDate:
+          type: string
+        status:
+          type: string
+        category:
+          $ref: '#/components/schemas/CategoryResponse'
+    PageEventResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              allOf:
+                - $ref: '#/components/schemas/PageResponse'
+                - type: object
+                  properties:
+                    result:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/EventResponse'
+    CategoryResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    EventUserCreationRequest:
+      type: object
+      required:
+        - eventId
+      properties:
+        eventId:
+          type: string
+        note:
+          type: string
+    EventUserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        eventId:
+          type: string
+        userId:
+          type: string
+        status:
+          type: string
+    EventUserInfoResponse:
+      type: object
+      properties:
+        eventUserId:
+          type: string
+        userProfile:
+          $ref: '#/components/schemas/UserProfileResponse'
+        event:
+          $ref: '#/components/schemas/EventResponse'
+        status:
+          type: string
+    PageEventUserInfoResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              allOf:
+                - $ref: '#/components/schemas/PageResponse'
+                - type: object
+                  properties:
+                    result:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/EventUserInfoResponse'
+    EventExportResponse:
+      type: object
+      properties:
+        fileName:
+          type: string
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventUserInfoResponse'
+    PostRequest:
+      type: object
+      required:
+        - eventId
+        - text
+      properties:
+        eventId:
+          type: string
+        text:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+            format: binary
+    PostResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        eventId:
+          type: string
+        text:
+          type: string
+        media:
+          type: array
+          items:
+            type: string
+    PagePostResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              allOf:
+                - $ref: '#/components/schemas/PageResponse'
+                - type: object
+                  properties:
+                    result:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/PostResponse'
+    CommentRequest:
+      type: object
+      required:
+        - postId
+        - text
+      properties:
+        postId:
+          type: string
+        text:
+          type: string
+        image:
+          type: string
+          format: binary
+    CommentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        postId:
+          type: string
+        text:
+          type: string
+    PageCommentResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              allOf:
+                - $ref: '#/components/schemas/PageResponse'
+                - type: object
+                  properties:
+                    result:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CommentResponse'
+    ChildCommentRequest:
+      type: object
+      required:
+        - commentId
+        - text
+      properties:
+        commentId:
+          type: string
+        text:
+          type: string
+        image:
+          type: string
+          format: binary
+    ChildCommentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        commentId:
+          type: string
+        text:
+          type: string
+    PageChildCommentResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              allOf:
+                - $ref: '#/components/schemas/PageResponse'
+                - type: object
+                  properties:
+                    result:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ChildCommentResponse'
+    PageReactResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              allOf:
+                - $ref: '#/components/schemas/PageResponse'
+                - type: object
+                  properties:
+                    result:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ReactResponse'
+    ReactResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        postId:
+          type: string
+        userId:
+          type: string
+    PageChildReactResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            data:
+              allOf:
+                - $ref: '#/components/schemas/PageResponse'
+                - type: object
+                  properties:
+                    result:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ChildReactResponse'
+    ChildReactResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        commentId:
+          type: string
+        userId:
+          type: string

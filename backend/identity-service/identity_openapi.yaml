@@ -1,0 +1,812 @@
+openapi: 3.0.3
+info:
+  title: Identity Service API
+  description: API cho dịch vụ quản lý định danh và xác thực người dùng trong hệ thống VolunteerHub
+  version: 1.0.0
+  contact:
+    name: Dong Vu
+    email: dongvu1105@example.com
+
+servers:
+  - url: http://localhost:8080/identity
+    description: Development server
+
+tags:
+  - name: Authentication
+    description: Các endpoint liên quan đến xác thực và quản lý token
+  - name: User Management
+    description: Các endpoint liên quan đến quản lý người dùng và tài khoản
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Đăng nhập
+      description: Xác thực thông tin đăng nhập của người dùng và trả về access token cùng refresh token
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthenticationRequest'
+            examples:
+              example1:
+                value:
+                  email: "user@example.com"
+                  password: "password123"
+      responses:
+        '200':
+          description: Đăng nhập thành công
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AuthenticationResponse'
+        '400':
+          description: Thông tin đăng nhập không hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '401':
+          description: Email hoặc mật khẩu không chính xác
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /auth/refresh-token:
+    post:
+      tags:
+        - Authentication
+      summary: Làm mới token
+      description: Tạo access token mới từ refresh token khi access token hết hạn
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+            examples:
+              example1:
+                value:
+                  accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      responses:
+        '200':
+          description: Làm mới token thành công
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AuthenticationResponse'
+        '400':
+          description: Token không hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '401':
+          description: Refresh token hết hạn hoặc không hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Đăng xuất
+      description: Vô hiệu hóa access token và refresh token của người dùng
+      operationId: logout
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+            examples:
+              example1:
+                value:
+                  accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      responses:
+        '200':
+          description: Đăng xuất thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Yêu cầu không hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /auth/introspect:
+    post:
+      tags:
+        - Authentication
+      summary: Xác thực token
+      description: Kiểm tra tính hợp lệ của access token
+      operationId: introspect
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IntrospectRequest'
+            examples:
+              example1:
+                value:
+                  accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      responses:
+        '200':
+          description: Kết quả xác thực token
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/IntrospectResponse'
+
+  /user/register:
+    post:
+      tags:
+        - User Management
+      summary: Đăng ký
+      description: Tạo tài khoản người dùng mới trong hệ thống
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreationRequest'
+            examples:
+              example1:
+                value:
+                  email: "newuser@example.com"
+                  password: "password123"
+                  username: "newuser123"
+                  firstName: "John"
+                  lastName: "Doe"
+                  phoneNumber: "0123456789"
+                  identityNumber: "123456789012"
+                  birthday: "1990-01-01"
+                  avatar: "https://example.com/avatar.jpg"
+                  gender: true
+                  role: ["USER"]
+      responses:
+        '200':
+          description: Đăng ký thành công
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Dữ liệu đầu vào không hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '409':
+          description: Email đã tồn tại
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /user/find-by-id/{id}:
+    get:
+      tags:
+        - User Management
+      summary: Tìm tài khoản người dùng theo ID
+      description: Lấy thông tin chi tiết của tài khoản người dùng dựa trên ID
+      operationId: findById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID của người dùng
+          schema:
+            type: string
+            format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: Tìm thấy người dùng
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: Không tìm thấy người dùng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /user/find-by-email/{email}:
+    get:
+      tags:
+        - User Management
+      summary: Tìm tài khoản người dùng theo email
+      description: Lấy thông tin chi tiết của tài khoản người dùng dựa trên địa chỉ email
+      operationId: findByEmail
+      parameters:
+        - name: email
+          in: path
+          required: true
+          description: Địa chỉ email của người dùng
+          schema:
+            type: string
+            format: email
+          example: "user@example.com"
+      responses:
+        '200':
+          description: Tìm thấy người dùng
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: Không tìm thấy người dùng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /user/role:
+    get:
+      tags:
+        - User Management
+      summary: Lấy tất cả role trong hệ thống
+      description: Lấy danh sách tất cả các vai trò (role) có sẵn trong hệ thống
+      operationId: findAllRoles
+      responses:
+        '200':
+          description: Danh sách role
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/RoleResponse'
+
+  /user/lock/{userId}:
+    put:
+      tags:
+        - User Management
+      summary: Admin khóa tài khoản người dùng
+      description: Khóa tài khoản của người dùng, ngăn không cho họ đăng nhập vào hệ thống. Chỉ admin mới có quyền thực hiện.
+      operationId: lockAccount
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ID của người dùng cần khóa
+          schema:
+            type: string
+            format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: Khóa tài khoản thành công
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AccountResponse'
+        '403':
+          description: Không có quyền thực hiện
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          description: Không tìm thấy người dùng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /user/unlock/{userId}:
+    put:
+      tags:
+        - User Management
+      summary: Admin mở tài khoản người dùng
+      description: Mở khóa tài khoản của người dùng, cho phép họ đăng nhập trở lại hệ thống. Chỉ admin mới có quyền thực hiện.
+      operationId: unlockAccount
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ID của người dùng cần mở khóa
+          schema:
+            type: string
+            format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '200':
+          description: Mở khóa tài khoản thành công
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AccountResponse'
+        '403':
+          description: Không có quyền thực hiện
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          description: Không tìm thấy người dùng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /user/find-all-account:
+    get:
+      tags:
+        - User Management
+      summary: Lấy tất cả tài khoản trong hệ thống
+      description: Lấy danh sách tất cả các tài khoản trong hệ thống với phân trang
+      operationId: findAllAccount
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Số trang (bắt đầu từ 1)
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: size
+          in: query
+          description: Số lượng tài khoản trên mỗi trang
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: Danh sách tài khoản
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PageResponseAccountResponse'
+        '403':
+          description: Không có quyền truy cập
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /user/search:
+    get:
+      tags:
+        - User Management
+      summary: Tìm kiếm tài khoản theo keyword
+      description: Tìm kiếm tài khoản dựa trên từ khóa (một phần của email) với phân trang
+      operationId: findAllAccountByKeyword
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Số trang (bắt đầu từ 1)
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: size
+          in: query
+          description: Số lượng tài khoản trên mỗi trang
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+        - name: keyword
+          in: query
+          description: Từ khóa tìm kiếm (một phần của email)
+          required: true
+          schema:
+            type: string
+          example: "user@"
+      responses:
+        '200':
+          description: Kết quả tìm kiếm
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PageResponseAccountResponse'
+        '400':
+          description: Thiếu từ khóa tìm kiếm
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '403':
+          description: Không có quyền truy cập
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token để xác thực API
+
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: Mã trạng thái (0 = thành công)
+          default: 0
+          example: 0
+        message:
+          type: string
+          description: Thông báo kết quả
+          default: "success!"
+          example: "success!"
+        data:
+          type: object
+          description: Dữ liệu trả về
+
+    AuthenticationRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: Địa chỉ email của người dùng
+          example: "user@example.com"
+        password:
+          type: string
+          format: password
+          minLength: 8
+          description: Mật khẩu (tối thiểu 8 ký tự)
+          example: "password123"
+
+    AuthenticationResponse:
+      type: object
+      properties:
+        valid:
+          type: boolean
+          description: Trạng thái xác thực
+          example: true
+        accessToken:
+          type: string
+          description: JWT access token
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        refreshToken:
+          type: string
+          description: JWT refresh token
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    RefreshTokenRequest:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
+      properties:
+        accessToken:
+          type: string
+          description: Access token hiện tại
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        refreshToken:
+          type: string
+          description: Refresh token
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    LogoutRequest:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
+      properties:
+        accessToken:
+          type: string
+          description: Access token cần vô hiệu hóa
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        refreshToken:
+          type: string
+          description: Refresh token cần vô hiệu hóa
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    IntrospectRequest:
+      type: object
+      required:
+        - accessToken
+      properties:
+        accessToken:
+          type: string
+          description: Access token cần kiểm tra
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    IntrospectResponse:
+      type: object
+      properties:
+        valid:
+          type: boolean
+          description: Token có hợp lệ hay không
+          example: true
+
+    UserCreationRequest:
+      type: object
+      required:
+        - email
+        - password
+        - username
+      properties:
+        email:
+          type: string
+          format: email
+          description: Địa chỉ email (duy nhất)
+          example: "newuser@example.com"
+        password:
+          type: string
+          format: password
+          minLength: 8
+          description: Mật khẩu (tối thiểu 8 ký tự)
+          example: "password123"
+        username:
+          type: string
+          minLength: 5
+          description: Tên đăng nhập (tối thiểu 5 ký tự)
+          example: "newuser123"
+        firstName:
+          type: string
+          description: Tên
+          example: "John"
+        lastName:
+          type: string
+          description: Họ
+          example: "Doe"
+        phoneNumber:
+          type: string
+          description: Số điện thoại
+          example: "0123456789"
+        identityNumber:
+          type: string
+          description: Số CMND/CCCD
+          example: "123456789012"
+        birthday:
+          type: string
+          format: date
+          description: Ngày sinh (yyyy-MM-dd)
+          example: "1990-01-01"
+        avatar:
+          type: string
+          format: uri
+          description: URL ảnh đại diện
+          example: "https://example.com/avatar.jpg"
+        gender:
+          type: boolean
+          description: Giới tính (true = nam, false = nữ)
+          example: true
+        role:
+          type: array
+          description: Danh sách các vai trò
+          items:
+            type: string
+          example: ["USER"]
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID người dùng
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        email:
+          type: string
+          format: email
+          description: Địa chỉ email
+          example: "user@example.com"
+        password:
+          type: string
+          description: Mật khẩu (đã mã hóa)
+          example: "$2a$10$..."
+        username:
+          type: string
+          description: Tên đăng nhập
+          example: "user123"
+        firstName:
+          type: string
+          description: Tên
+          example: "John"
+        lastName:
+          type: string
+          description: Họ
+          example: "Doe"
+        phoneNumber:
+          type: string
+          description: Số điện thoại
+          example: "0123456789"
+        birthday:
+          type: string
+          format: date
+          description: Ngày sinh
+          example: "1990-01-01"
+        identityNumber:
+          type: string
+          description: Số CMND/CCCD
+          example: "123456789012"
+        gender:
+          type: boolean
+          description: Giới tính
+          example: true
+        role:
+          type: array
+          description: Danh sách vai trò
+          items:
+            $ref: '#/components/schemas/Role'
+        avatar:
+          type: string
+          format: uri
+          description: URL ảnh đại diện
+          example: "https://example.com/avatar.jpg"
+
+    AccountResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID tài khoản
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        email:
+          type: string
+          format: email
+          description: Địa chỉ email
+          example: "user@example.com"
+        password:
+          type: string
+          description: Mật khẩu (đã mã hóa)
+          example: "$2a$10$..."
+        statusAccount:
+          type: boolean
+          description: Trạng thái tài khoản (true = hoạt động, false = bị khóa)
+          example: true
+        role:
+          type: array
+          description: Danh sách vai trò
+          items:
+            $ref: '#/components/schemas/Role'
+
+    RoleResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Tên vai trò
+          example: "USER"
+        description:
+          type: string
+          description: Mô tả vai trò
+          example: "Người dùng thông thường"
+
+    Role:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Tên vai trò
+          example: "USER"
+        description:
+          type: string
+          description: Mô tả vai trò
+          example: "Người dùng thông thường"
+
+    PageResponseAccountResponse:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+          description: Trang hiện tại
+          example: 1
+        totalPages:
+          type: integer
+          description: Tổng số trang
+          example: 10
+        pageSize:
+          type: integer
+          description: Kích thước trang
+          example: 10
+        totalElements:
+          type: integer
+          format: int64
+          description: Tổng số phần tử
+          example: 100
+        hasNextPage:
+          type: boolean
+          description: Có trang tiếp theo không
+          example: true
+        hasPreviousPage:
+          type: boolean
+          description: Có trang trước đó không
+          example: false
+        result:
+          type: array
+          description: Danh sách kết quả
+          items:
+            $ref: '#/components/schemas/AccountResponse'

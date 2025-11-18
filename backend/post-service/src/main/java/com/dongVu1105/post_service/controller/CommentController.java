@@ -23,6 +23,7 @@ public class CommentController {
     CommentService commentService;
     ObjectMapper objectMapper;
 
+    // Tạo bình luận cho 1 bài viết
     @PostMapping("/create")
     public ApiResponse<CommentResponse> create (
             @RequestPart(value = "request") String requestJson,
@@ -31,12 +32,14 @@ public class CommentController {
         return ApiResponse.<CommentResponse>builder().data(commentService.create(file, request)).build();
     }
 
+    // Xóa bình luận cho 1 bài viết
     @DeleteMapping("/delete/{commentId}")
     public ApiResponse<Void> delete (@PathVariable("commentId") String commentId){
         commentService.delete(commentId);
         return ApiResponse.<Void>builder().build();
     }
 
+    // Tìm tất cả bình luận trong một bài viết
     @GetMapping("/find-by-postId")
     public ApiResponse<PageResponse<CommentResponse>> findAllByPostId (
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,

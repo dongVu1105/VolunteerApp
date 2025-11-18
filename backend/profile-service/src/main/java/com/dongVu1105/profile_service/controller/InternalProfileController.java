@@ -22,6 +22,7 @@ public class InternalProfileController {
 
     @PostMapping("/user")
     public ApiResponse<UserProfileResponse> create (@RequestBody ProfileCreationRequest request){
+        System.out.println("Da vao profile controller");
         return ApiResponse.<UserProfileResponse>builder()
                 .data(userProfileService.create(request)).build();
     }
