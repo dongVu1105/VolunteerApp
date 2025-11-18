@@ -1,25 +1,24 @@
-package com.dongVu1105.post_service.dto.response;
+package com.dongVu1105.post_service.entity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+import java.time.Instant;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CommentResponse {
+@Document(value = "comment")
+public class ChildComment {
+    @MongoId
     String id;
-    String postId;
+    String commentId;
     String ownerId;
-    String ownerUsername;
-    String ownerAvatar;
-    long reactCount;
-    long commentCount;
-    boolean isReactedByCurrentUser;
     String text;
     String imageURL;
-    String createdDate;
+    Instant createdDate;
 }
