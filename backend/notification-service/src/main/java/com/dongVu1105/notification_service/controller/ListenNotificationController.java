@@ -63,9 +63,19 @@ public class ListenNotificationController {
         notificationService.postNotification(postNoti, PredefinedNotification.NEW_COMMENT);
     }
 
+    @KafkaListener(topics = "reply-comment")
+    public void listenReplyCommentNotification (PostNoti postNoti){
+        notificationService.postNotification(postNoti, PredefinedNotification.NEW_REPLY_COMMENT);
+    }
+
     @KafkaListener(topics = "react")
     public void listenReactNotification (PostNoti postNoti){
         notificationService.postNotification(postNoti, PredefinedNotification.NEW_REACT);
+    }
+
+    @KafkaListener(topics = "react-of-comment")
+    public void listenReactOfCommentNotification (PostNoti postNoti){
+        notificationService.postNotification(postNoti, PredefinedNotification.NEW_REACT_OF_COMMENT);
     }
 
 }
