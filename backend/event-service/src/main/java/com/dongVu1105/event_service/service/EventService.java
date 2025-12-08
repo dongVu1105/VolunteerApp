@@ -124,6 +124,7 @@ public class EventService {
     }
 
     @PreAuthorize("hasRole('USER')")
+    // @Cacheable(value = "events-by-category-date", key = "{#page, #size, #category, #fromDate, #toDate}")
     public PageResponse<EventResponse> findAllByCategoryAndDate (int page, int size, String category, Instant fromDate, Instant toDate){
         Sort sort = Sort.by("createdDate").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
@@ -143,6 +144,7 @@ public class EventService {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    // @Cacheable(value = "pending-events", key = "{#page, #size}")
     public PageResponse<EventResponse> findAllPendingEvent (int page, int size){
         Sort sort = Sort.by("createdDate").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
