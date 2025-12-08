@@ -3,17 +3,12 @@ package com.dongVu1105.event_service.service;
 import com.dongVu1105.event_service.dto.request.EventCreationRequest;
 import com.dongVu1105.event_service.dto.request.EventNoti;
 import com.dongVu1105.event_service.dto.request.EventUpdationRequest;
-import com.dongVu1105.event_service.dto.request.EventUserCreationRequest;
 import com.dongVu1105.event_service.dto.response.*;
 import com.dongVu1105.event_service.entity.Event;
-import com.dongVu1105.event_service.entity.EventUser;
-import com.dongVu1105.event_service.enums.EventUserStatus;
 import com.dongVu1105.event_service.exception.AppException;
 import com.dongVu1105.event_service.exception.ErrorCode;
 import com.dongVu1105.event_service.mapper.EventMapper;
-import com.dongVu1105.event_service.mapper.EventUserMapper;
 import com.dongVu1105.event_service.repository.EventRepository;
-import com.dongVu1105.event_service.repository.EventUserRepository;
 import com.dongVu1105.event_service.repository.httpclient.FileClient;
 import com.dongVu1105.event_service.repository.httpclient.IdentityClient;
 import com.dongVu1105.event_service.repository.httpclient.UserProfileClient;
@@ -22,6 +17,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -52,6 +50,7 @@ public class EventService {
     UserProfileClient userProfileClient;
 
     @PreAuthorize("hasRole('EVENT_MANAGER')")
+    @CachePut(value = "events", key = "#result.id")
     public EventResponse create (EventCreationRequest request, MultipartFile file){
         Event event = eventMapper.toEvent(request);
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -68,6 +67,7 @@ public class EventService {
     }
 
     @PreAuthorize("hasRole('EVENT_MANAGER')")
+    @CachePut(value = "events", key = "#request.id")
     public EventResponse update (EventUpdationRequest request, MultipartFile file){
         Event event = eventRepository.findById(request.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
@@ -79,8 +79,8 @@ public class EventService {
         event = eventRepository.save(event);
         return this.toEventResponse(event);
     }
-
     @PreAuthorize("hasRole('ADMIN')")
+    @CachePut(value = "events", key = "#eventId")
     public EventResponse acceptEvent (String eventId){
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
@@ -92,6 +92,7 @@ public class EventService {
     }
 
     @PreAuthorize("hasAnyRole('EVENT_MANAGER', 'ADMIN')")
+    @CacheEvict(value = "events", key = "#eventId")
     public void delete (String eventId){
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
@@ -109,11 +110,13 @@ public class EventService {
         eventRepository.deleteById(eventId);
     }
 
+    @Cacheable(value = "events", key = "#id")
     public EventResponse findById (String id){
         return this.toEventResponse(eventRepository.findById(id).orElseThrow(
                 () -> new AppException(ErrorCode.EVENT_NOT_EXISTED) ));
     }
 
+    @Cacheable(value = "event-status", key = "#eventId")
     public Boolean ableToPost (String eventId){
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new AppException(ErrorCode.EVENT_NOT_EXISTED));
